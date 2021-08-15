@@ -1,0 +1,130 @@
+<nz-page-header class="manageAreaHeader" nzTitle="Issue Type">
+  <nz-page-header-extra>
+    <button nz-button (click)="create()">Create</button>
+  </nz-page-header-extra>
+</nz-page-header>
+<div class="m-0 mt-4 row">
+  <div class="col-12">
+    <nz-table class="issueTable" *ngIf="issueTypeService.issueTypes" #issueTypeTable
+      [nzData]="issueTypeService.issueTypes" nzPageSize="999999" [nzNoResult]="createDocTemp" nzShowPagination="false">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Active</th>
+          <th>Workflow</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let it of issueTypeTable.data">
+          <td class="v-align-middle semi-bold">
+            <i class="fa fa-{{it.iconUrl}}"></i>
+            {{it.name}}
+          </td>
+          <td class="v-align-middle">{{it.description}}
+          </td>
+          <td class="v-align-middle"><span *ngIf="it.active">Active</span><span *ngIf="!it.active">Inactive</span>
+          </td>
+          <td class="v-align-middle">
+            <a routerLink="/project/{{it.project.key}}/manage/workflow/{{it.workflow.id}}">{{it.workflow.name}}</a>
+          </td>
+          <td>
+            <a (click)="openissueType(it.id)" class="btn btn-default btn-xs pull-right">
+              <app-icon height="20" width="20" icon="pencil"></app-icon>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+      <ng-template #createDocTemp>
+        <img src="/assets/img/empty.svg" class="jdempty" width="200">
+      </ng-template>
+    </nz-table>
+  </div>
+</div>
+<nz-drawer *ngIf="issueType" [nzMaskClosable]="false" [nzClosable]="true" nzWidth="30vw"
+  [nzVisible]="issueType != undefined" nzPlacement="right" (nzOnClose)="cancel()">
+  <form (ngSubmit)="save(isActive)" #issueTypeForm="ngForm" ngNativeValidate>
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" class="form-control" required name="groupName" placeholder="Name" [(ngModel)]="issueType.name">
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <input type="text" class="form-control" required name="groupDescription" placeholder="Description"
+        [(ngModel)]="issueType.description">
+    </div>
+    <div class="form-group form-check m-t-20">
+      <mat-slide-toggle #isActive [checked]="issueType.active">Active</mat-slide-toggle>
+    </div>
+    <div class="form-group">
+      <label>Icon</label>
+      <div class="input-group">
+        <select name="iconsDropdown" id="iconsDropdown" class="form-control" required [(ngModel)]="issueType.iconUrl">
+          <option value="glass">Glass</option>
+          <option value="compass">Compass</option>
+          <option value="inbox">Inbox</option>
+          <option value="road">Road</option>
+          <option value="flag">Flag</option>
+          <option value="bug">Bug</option>
+          <option value="adjust">Adjust</option>
+          <option value="space-shuttle">Space Shuttle</option>
+          <option value="question-circle">Question Circle</option>
+          <option value="gift">Gift</option>
+          <option value="leaf">Leaf</option>
+          <option value="fire">Fire</option>
+          <option value="plane">Plane</option>
+          <option value="paper-plane">Paper plane</option>
+          <option value="lemon-o">Lemon</option>
+          <option value="binoculars">Binoculars</option>
+          <option value="bullhorn">Bullhorn</option>
+          <option value="bell">Bell</option>
+          <option value="flask">Flask</option>
+          <option value="scissors">Scissors</option>
+          <option value="truck">Truck</option>
+          <option value="gavel">Gravel</option>
+          <option value="bolt">Bolt</option>
+          <option value="umbrella">Umbrella</option>
+          <option value="stethoscope">Stethoscope</option>
+          <option value="suitcase">Suitcase</option>
+          <option value="shield">Shield</option>
+          <option value="rocket">Rocket</option>
+          <option value="anchor">Anchor</option>
+        </select>
+        <div class="input-group-append">
+          <span class="input-group-text" id="basic-addon2">
+            <i class="fa fa-{{issueType.iconUrl}}"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="form-group" *ngIf="!issueType.id">
+      <label>Workflow</label>
+      <select [disabled]="issueType.newWorkflow" name="workflow" class="form-control" [(ngModel)]="issueType.workflow"
+        required>
+        <option value="">---SELECT---</option>
+        <option *ngFor="let w of applicableWorkflows" [ngValue]="w">{{w.name}}</option>
+      </select>
+      <label nz-checkbox name="newWorkflowCheck" [(ngModel)]="issueType.newWorkflow">Create new workflow</label>
+    </div>
+    <div *ngIf="issueType.newWorkflow" class="alert alert-info">New workflow will be created with name:
+      {{issueType.name}}</div>
+    <div class="footer">
+      <button type="button" (click)="cancel()" style="margin-right: 8px;" class="ant-btn">Cancel</button>
+      <button type="submit" class="ant-btn ant-btn-primary" *ngIf="!issueType.id">Create</button>
+      <button type="submit" class="ant-btn ant-btn-primary" *ngIf="issueType.id">Update</button>
+    </div>
+  </form>
+  <div class="card m-t-15 hide" *ngIf="issueType.editable">
+    <div class="card-body">
+      <div class="form-group form-group-default">
+        <label>Change Workflow</label>
+        <select name="workflow" class="form-control" [(ngModel)]="model.changeTo" required>
+          <option value="">---SELECT---</option>
+          <option *ngFor="let w of applicableWorkflowsToChange" [ngValue]="w.id">{{w.name}}</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" (click)="changeWorkflow(model.changeTo)">Change</button>
+    </div>
+  </div>
+</nz-drawer>

@@ -1,0 +1,66 @@
+<nz-card class="wiki-area">
+  <h2>
+    <a class="btn-default" routerLink="..">
+      <app-icon height="18" width="18" icon="arrow-90deg-left"></app-icon>
+    </a>
+    Revisions
+  </h2>
+  <div class="row">
+    <div class="col-4">
+      <ng-template #emptyTpl>
+        No history found
+      </ng-template>
+      <nz-table class="revPageTbl" nzShowPagination="false" nzPageSize="999999" #revTable [nzData]="revisions"
+        [nzNoResult]="emptyTpl">
+        <thead>
+          <tr>
+            <th>Version</th>
+            <th>Updated</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>current</td>
+            <td></td>
+            <td>
+              <button nz-button [nzType]="source === 0 ? 'primary' : 'default'" (click)="viewHistory(0)">
+                view
+              </button>
+            </td>
+          </tr>
+          <tr *ngFor="let a of revTable.data">
+            <td class="p-2">
+              <h5 class="m-0" style="font-family: Heebo;font-weight: 500;font-size: 14px;color: #001737;">
+                {{a.version}}</h5>
+            </td>
+            <td>
+              {{a.updated | date}}
+              by
+              <span>{{ a.updatedLogin.fullName }}</span>
+            </td>
+            <td><button nz-button [nzType]="source === a.version ? 'primary' : 'default'"
+                (click)="viewHistory(a.version)">
+                View
+              </button></td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+    <div class="col-8">
+      <div class="text-center mt-5" *ngIf="loading">
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+      <div *ngIf="revision">
+        <h5 class="hint-text mb-0">TITLE</h5>
+        <h4 class="mt-0">{{revision.title}}</h4>
+        <h5 class="hint-text mb-0">CONTENT</h5>
+        <div id="view-editormd" class="p-1">
+          <textarea style="display:none;" [value]="revision.content"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</nz-card>

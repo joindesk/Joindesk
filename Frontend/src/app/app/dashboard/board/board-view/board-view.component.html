@@ -1,0 +1,97 @@
+<nz-spin nzSimple style="text-align: center;" *ngIf="loading"></nz-spin>
+<div class="row" *ngIf="board">
+  <div class="col-12 m-t-10">
+    <div class="c-profile__list members">
+      <app-usermedia class="c-profile" *ngFor="let m of members" (click)="toggleMember(m)" [user]="m"
+        [class.highLightMember]="highLightMember(m)" [s]="'d32'" [tooltip]="m.fullName" [pic]="m.pic"></app-usermedia>
+    </div>
+    <button *ngIf="editable" class="btn btn-default pull-right" (click)="addLane()">
+      New lane
+    </button>
+  </div>
+  <div class="clearfix"></div>
+  <section class="lists-container" cdkDropListGroup>
+    <div class="alert alert-info col-12" *ngIf="board.lanes.length <= 0">No lanes found add one to get started</div>
+    <div class="list" [style.border-top-color]="lane.color" *ngFor="let lane of board.lanes" [attr.data-lane]="lane.id"
+      cdkDropList (cdkDropListDropped)="drop($event)">
+      <h3 class="list-title">{{lane.name}} ({{lane.issues.length}}) <div class="pull-right">
+          <app-icon class="cursorpointer" (click)="editLane(lane)" height="18" width="18" icon="pencil"
+            *ngIf="editable">
+          </app-icon>
+        </div>
+      </h3>
+      <ul class="list-items">
+        <li class="card lanecard lanecard-{{i.priority}}" *ngFor="let i of lane.issues | boardFilter: filterArgs"
+          [attr.data-issue]="i.key" cdkDrag>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-6">
+                <a class="lanekey" (click)="openIssue(i.keyPair)">
+                  {{i.project.key}}-{{i.key}}</a>
+              </div>
+              <div class="col-6 text-right">
+                <span class="p-t-5 m-l-5 p-b-5" style="cursor: default;"
+                  (click)="searchByStatus(i.currentStep.issueStatus.id)"
+                  class="issueStatus issueStatus-{{i.currentStep.issueStatus.issueLifeCycle}}">{{i.currentStep.issueStatus.name}}</span>
+              </div>
+            </div>
+            <div class="card-title cursorpointer" (click)="openIssue(i.keyPair)">
+              <h4 title="{{i.summary}}">{{i.summary}}</h4>
+            </div>
+            <div class="row">
+              <div class="col-8">
+                <i nzTooltipTitle="{{i.issueType.name}}" nz-tooltip nzTooltipPlacement="bottom"
+                  style="font-size: 1.2rem;" class="fa fa-{{i.issueType.iconUrl}}"></i>
+                <span nzTooltipTitle="{{i.priority}}" nz-tooltip nzTooltipPlacement="bottom"
+                  (click)="searchByPriority(i.priority)" class="pl-3 pr-3">
+                  <img *ngIf="i.priority === 'Urgent'" src="/assets/img/priority-blocker.svg" alt="" height="16" />
+                  <img *ngIf="i.priority === 'High'" src="/assets/img/priority-high.svg" alt="" height="16" />
+                  <img *ngIf="i.priority === 'Normal'" src="/assets/img/priority-normal.svg" alt="" height="16" />
+                  <img *ngIf="i.priority === 'Low'" src="/assets/img/priority-low.svg" alt="" height="16" />
+                </span>
+              </div>
+              <div class="col-4 text-right">
+                <app-usermedia class="pull-right pl-3" *ngIf="i.assignee" [s]="'d24'" [user]="i.assignee"
+                  [pic]="i.assignee.pic" [tooltip]="i.assignee.fullName" (click)="searchByAssignee(i.assignee.id)"
+                  nzTooltipTitle="{{i.assignee.fullName}}" nz-tooltip nzTooltipPlacement="bottom"></app-usermedia>
+                <app-usermedia class="pull-right pl-3" *ngIf="!i.assignee" [s]="'d24'" [pic]="'unassigned'"
+                  [tooltip]="'?'">
+                </app-usermedia>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <button *ngIf="editable" class="add-list-btn btn" (click)="addLane()">Add a lane</button>
+  </section>
+  <!-- End of lists container -->
+</div>
+<nz-modal [(nzVisible)]="showLaneEdit" nzTitle="Lane" (nzOnCancel)="showLaneEdit = false;get();" [nzFooter]="null">
+  <div *ngIf="lane">
+    <form (ngSubmit)="saveLane()" #issueForm="ngForm" ngNativeValidate>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" class="form-control" required name="laneName" placeholder="Name" [(ngModel)]="lane.name">
+      </div>
+      <div class="form-group">
+        <label>Order</label>
+        <input type="number" class="form-control" required name="laneOrder" placeholder="Order"
+          [(ngModel)]="lane.laneOrder">
+      </div>
+      <div class="form-group m-t-20" *ngIf="lane.id">
+        <label>Statuses ({{lane.statuses.length}} selected)</label>
+        <nz-select name="possibleStatuses" nzMode="multiple" nzPlaceHolder="None selected" [(ngModel)]="lane.statuses"
+          [compareWith]="compareFn">
+          <nz-option *ngFor="let a of lane.possibleStatuses" [nzLabel]="a.name" [nzValue]="a"></nz-option>
+        </nz-select>
+      </div>
+      <div class="text-right">
+        <button nz-button type="submit" nzType="primary" *ngIf="!lane.id">Create</button>
+        <button nz-button type="submit" nzType="primary" *ngIf="lane.id">Update</button>
+        <button class="ml-2" type="button" nz-button nzType="default" nzDanger (click)="deleteLane(lane)"
+          *ngIf="lane.id"><i nz-icon nzType="delete" nzTheme="outline"></i></button>
+      </div>
+    </form>
+  </div>
+</nz-modal>

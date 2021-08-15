@@ -1,0 +1,10 @@
+li.nav-item.active{
+    border-right: 3px solid #ff0000;
+}
+li.nav-item.active>a{
+    font-weight: bold;
+    color: rgba(122, 137, 148, 0.9);
+}
+.nav-tabs > li > a {
+    padding: 5px 20px;
+}

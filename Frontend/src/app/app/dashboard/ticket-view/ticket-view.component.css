@@ -1,0 +1,11 @@
+.descriptionBox{
+    height: 70px;
+    max-height: 70px;
+    min-height: 70px;
+    overflow-x: auto;
+    word-wrap: break-word;
+}
+.card-title>a{
+    color: #626262 !important;
+    opacity: 1 !important;
+}

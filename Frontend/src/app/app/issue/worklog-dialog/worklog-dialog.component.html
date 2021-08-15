@@ -1,0 +1,41 @@
+<nz-spin nzTip="Loading..." [nzSpinning]="loading">
+    <form class="pl-2" nz-form (ngSubmit)="save()" ngNativeValidate *ngIf="workLog">
+        <nz-form-item class="m-0" *ngIf="!workLog.issue">
+            <nz-form-label>Issue Key</nz-form-label>
+            <nz-form-control>
+                <input name="issuekey" [(ngModel)]="workLog.issueKey" required nz-input
+                    placeholder="eg. SP-123 or TEST-123" />
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="m-0">
+            <nz-form-label>Duration</nz-form-label>
+            <nz-form-control>
+                <input name="workMinutes" [(ngModel)]="workLog.work" required nz-input placeholder="eg. 2w 3d 4h 30m" />
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="m-0">
+            <nz-form-label>Log from</nz-form-label>
+            <nz-form-control>
+                <nz-date-picker style="width: 100%;" nzShowTime="true" name="workFrom" nzFormat="yyyy-MM-dd HH:mm:ss"
+                    [(ngModel)]="workLog.workFrom">
+                </nz-date-picker>
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="m-0">
+            <nz-form-label>Description of work</nz-form-label>
+            <nz-form-control>
+                <input name="workDescription" required nz-input [(ngModel)]="workLog.workDescription"
+                    placeholder="Leave a comment" maxlength="250" />
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="text-right mt-3">
+            <nz-form-control>
+                <button class="mr-3" nz-button *ngIf="workLog.id" (click)="delete(); $event.preventDefault()"
+                    nzType="danger"><i nz-icon nzType="delete" nzTheme="outline"></i></button>
+                <button type="button" nz-button nzType="default" (click)="destroyModal()">Cancel</button>
+                <button nz-button nzType="primary">Save</button>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+    <div *nzModalFooter class="p-0"></div>
+</nz-spin>

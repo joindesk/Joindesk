@@ -1,0 +1,53 @@
+version: "3.7"
+services:
+    web:
+        image: jdfrontend
+        ports:
+            - "443:443"
+        environment:
+            - NGINX_PORT=443
+	depends_on:
+            - backend
+    backend:
+        image: jdbackend
+        environment:
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
+            - SPRING_DATASOURCE_USERNAME=${POSTGRES_NON_ROOT_USER}
+            - SPRING_DATASOURCE_PASSWORD=${POSTGRES_NON_ROOT_PASSWORD}
+        ports:
+            - "9000:9000"
+        depends_on:
+            - db
+    db:
+        image: postgres:12.2
+        restart: always
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_NON_ROOT_USER: ${POSTGRES_NON_ROOT_USER}
+            POSTGRES_NON_ROOT_PASSWORD: ${POSTGRES_NON_ROOT_PASSWORD}
+            PGDATA: /var/lib/postgresql/data
+        volumes:
+            - psql12db-data:/var/lib/postgresql/data
+            - ./init-db.sh:/docker-entrypoint-initdb.d/init-data.sh
+        ports:
+            - "5432:5432"
+    pgadmin:
+        image: dpage/pgadmin4:4.18
+        restart: always
+        environment:
+            PGADMIN_DEFAULT_EMAIL: admin@joindeskapp.com
+            PGADMIN_DEFAULT_PASSWORD: secret
+            PGADMIN_LISTEN_PORT: 80
+        ports:
+            - "8080:80"
+        volumes:
+            - pgadmin4-data:/var/lib/pgadmin
+        links:
+            - "db:pgsql-server"
+        depends_on:
+            - db
+volumes:
+    psql12db-data:
+    pgadmin4-data:

@@ -1,0 +1,12 @@
+.note-popover.popover {
+    position: fixed !important;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    padding: 10px 16px;
+    text-align: right;
+    left: 0px;
+}

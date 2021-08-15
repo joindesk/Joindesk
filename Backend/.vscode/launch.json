@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-JoindeskApplication<joindesk>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "com.ariseontech.joindesk.JoindeskApplication",
+            "projectName": "joindesk",
+            "args": ""
+        }
+    ]
+}

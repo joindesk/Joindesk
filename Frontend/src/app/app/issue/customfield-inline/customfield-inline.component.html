@@ -1,0 +1,118 @@
+<div *ngIf="field && field.customField">
+  <div class="contentWrapper">
+    <h5 class="hint-head font-roboto mt-4 small mb-2">{{field.customField.name}}</h5>
+    <div *ngIf="!edit" class="editable" [class.pencil]="pencil" (mouseenter)="editable ? pencil = true: pencil = false"
+      (mouseleave)="pencil = false" (click)="enableEdit()">
+      <p>{{field.value}}</p>
+    </div>
+    <div *ngIf="edit" class="pl-2">
+      <form (ngSubmit)="saveCustomField(v.value)" #IssueTypeForm="ngForm" ngNativeValidate
+        *ngIf="field.customField.type==='TEXT'" class="mb-3">
+        <input type="text" class="form-control" value="{{field.value}}" #v
+          [attr.required]="field.customField.required ? true: null">
+        <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+        <small class="form-text text-muted" *ngIf="field.customField.helpText">
+          {{field.customField.helpText}}
+        </small>
+      </form>
+      <form (ngSubmit)="saveCustomField(v.value)" #IssueTypeForm="ngForm" ngNativeValidate
+        *ngIf="field.customField.type==='NUMBER'" class="mb-3">
+        <input type="number" class="form-control" value="{{field.value}}" #v
+          [attr.required]="field.customField.required ? true: null">
+        <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+        <small class="form-text text-muted" *ngIf="field.customField.helpText">
+          {{field.customField.helpText}}
+        </small>
+      </form>
+      <form (ngSubmit)="saveCustomField(v.value)" #IssueTypeForm="ngForm" ngNativeValidate
+        *ngIf="field.customField.type==='DATE'" class="mb-3">
+        <input type="date" class="form-control" value="{{field.value}}" #v
+          [attr.required]="field.customField.required ? true: null">
+        <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+        <small class="form-text text-muted" *ngIf="field.customField.helpText">
+          {{field.customField.helpText}}
+        </small>
+      </form>
+      <form (ngSubmit)="saveCustomField(v.value)" #IssueTypeForm="ngForm" ngNativeValidate
+        *ngIf="field.customField.type==='SELECT' && field.customField.multiple" class="mb-3">
+        <!-- <mat-select #v [(value)]="field.values" class="form-control" multiple>
+          <mat-option *ngFor="let a of field.customField.values" [value]="a">{{a}}</mat-option>
+        </mat-select> -->
+        <nz-select name="field.id" #v [(ngModel)]="field.values" nzMode="tags" [nzTokenSeparators]="[',']"
+          nzAllowClear="true">
+          <nz-option *ngFor="let option of field.customField.values" [nzLabel]="option" [nzValue]="option">
+          </nz-option>
+        </nz-select>
+        <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+        <small class="form-text text-muted" *ngIf="field.customField.helpText">
+          {{field.customField.helpText}}
+        </small>
+      </form>
+      <form (ngSubmit)="saveCustomField(v.value)" #IssueTypeForm="ngForm" ngNativeValidate
+        *ngIf="field.customField.type==='SELECT' && !field.customField.multiple" class="mb-3">
+        <!-- <mat-select #v [(value)]="field.value" class="form-control">
+          <mat-option value="">--Clear--</mat-option>
+          <mat-option *ngFor="let a of field.customField.values" [value]="a">{{a}}</mat-option>
+        </mat-select> -->
+        <nz-select name="field.id" #v [(ngModel)]="field.value" nzAllowClear="true">
+          <nz-option *ngFor="let option of field.customField.values" [nzLabel]="option" [nzValue]="option">
+          </nz-option>
+        </nz-select>
+        <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+        <small class="form-text text-muted" *ngIf="field.customField.helpText">
+          {{field.customField.helpText}}
+        </small>
+      </form>
+      <form (ngSubmit)="saveCustomField(v.value)" #IssueTypeForm="ngForm" ngNativeValidate
+        *ngIf="field.customField.type==='USER' && !field.customField.multiple" class="mb-3">
+        <mat-select #v [(value)]="field.value" class="form-control">
+          <mat-option value="">--Clear--</mat-option>
+          <mat-option *ngFor="let a of members" [value]="a.userName">{{a.fullName}}</mat-option>
+        </mat-select>
+        <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+        <small class="form-text text-muted" *ngIf="field.customField.helpText">
+          {{field.customField.helpText}}
+        </small>
+      </form>
+      <form (ngSubmit)="saveCustomField(v.value)" #IssueTypeForm="ngForm" ngNativeValidate
+        *ngIf="field.customField.type==='USER' && field.customField.multiple" class="mb-3">
+        <mat-select #v [(value)]="field.values" class="form-control" multiple>
+          <mat-option *ngFor="let a of members" [value]="a.userName">{{a.fullName}} [{{a.userName}}]</mat-option>
+        </mat-select>
+        <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+        <small class="form-text text-muted" *ngIf="field.customField.helpText">
+          {{field.customField.helpText}}
+        </small>
+      </form>
+      <form (ngSubmit)="saveCustomField(v.value)" #IssueTypeForm="ngForm" ngNativeValidate
+        *ngIf="field.customField.type==='VERSION' && !field.customField.multiple" class="mb-3">
+        <mat-select #v [(value)]="field.value" class="form-control">
+          <mat-option value="">--Clear--</mat-option>
+          <mat-option *ngFor="let a of versions" [value]="a.key">{{a.name}}</mat-option>
+        </mat-select>
+        <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+        <small class="form-text text-muted" *ngIf="field.customField.helpText">
+          {{field.customField.helpText}}
+        </small>
+      </form>
+      <form (ngSubmit)="saveCustomField(v.value)" #IssueTypeForm="ngForm" ngNativeValidate
+        *ngIf="field.customField.type==='VERSION' && field.customField.multiple" class="mb-3">
+        <mat-select #v [(value)]="field.values" class="form-control" multiple>
+          <mat-option *ngFor="let a of versions" [value]="a.key">{{a.name}}</mat-option>
+        </mat-select>
+        <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+        <small class="form-text text-muted" *ngIf="field.customField.helpText">
+          {{field.customField.helpText}}
+        </small>
+      </form>
+    </div>
+  </div>
+</div>
+<ng-template #formButtons>
+  <div *ngIf="edit" class="buttonsWrapper">
+    <button nz-button nzType="primary" class="fCheckBtn" type="submit" nzSize="default"><i nz-icon
+        nzType="check"></i></button>
+    <button nz-button nzType="default" class="fCrossBtn" (click)="cancelEdit();$event.stopPropagation();"
+      nzSize="default"><i nz-icon nzType="close"></i></button>
+  </div>
+</ng-template>

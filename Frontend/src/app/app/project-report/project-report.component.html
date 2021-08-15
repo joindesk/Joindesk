@@ -1,0 +1,96 @@
+<nz-page-header class="manageAreaHeader" nzTitle="Report">
+</nz-page-header>
+<div class="row m-2 mt-4">
+  <div class="col-3">
+    <form nz-form nzLayout="vertical">
+      <nz-form-item>
+        <nz-form-label nzFor="reportType">Report Type</nz-form-label>
+        <nz-form-control>
+          <nz-select name="reportType" [(ngModel)]="filter.type">
+            <nz-option nzValue="crir" nzLabel="Created vs Resolved Issues Report"></nz-option>
+            <nz-option nzValue="pcr" nzLabel="Pie Chart Report"></nz-option>
+            <nz-option nzValue="rcir" nzLabel="Recently Created Issues Report"></nz-option>
+            <nz-option nzValue="ttr" nzLabel="Time Tracking Report"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf="filters && filter.type !== 'ttr'">
+        <nz-form-label nzFor="filter">Filter</nz-form-label>
+        <nz-form-control nzExtra="Only public filters will be available">
+          <nz-select name="filter" [(ngModel)]="filter.filter" [compareWith]="compareFn">
+            <nz-option *ngFor="let b of filters" [nzValue]="b" [nzLabel]="b.name"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf="filter.type !== 'pcr' && filter.type !== 'ttr'">
+        <nz-form-label nzFor="dispGrp">Display group</nz-form-label>
+        <nz-form-control>
+          <nz-select name="dispGrp" [(ngModel)]="filter.group">
+            <nz-option nzValue="daily" nzLabel="Daily"></nz-option>
+            <nz-option nzValue="weekly" nzLabel="Weekly"></nz-option>
+            <nz-option nzValue="monthly" nzLabel="Monthly"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf="filter.type === 'pcr'">
+        <nz-form-label nzFor="chrt">Chart</nz-form-label>
+        <nz-form-control>
+          <nz-select name="chrt" [(ngModel)]="filter.pcrGroup">
+            <nz-option nzValue="assignee" nzLabel="Assignee"></nz-option>
+            <nz-option nzValue="reporter" nzLabel="Reporter"></nz-option>
+            <nz-option nzValue="label" nzLabel="Label"></nz-option>
+            <nz-option nzValue="component" nzLabel="Component"></nz-option>
+            <nz-option nzValue="version" nzLabel="Version"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label nzFor="range">Range</nz-form-label>
+        <nz-form-control>
+          <nz-range-picker name="range" [(ngModel)]="filter.reportRange"></nz-range-picker>
+        </nz-form-control>
+      </nz-form-item>
+      <button nz-button nzType="primary" (click)="generateReport()">Generate</button>
+    </form>
+  </div>
+  <div class="col-9">
+    <div class="m-3" *ngIf="reportFrom && reportTo">Showing report between {{reportFrom}} ~ {{reportTo}}
+      ({{filter.reportZone}})</div>
+    <div class="alert alert-warning" *ngIf="pieReportData && pieReportData.data.length == 0">No Data found</div>
+    <div class="alert alert-warning" *ngIf="crirReportData && crirReportData.labels.length == 0">No Data found</div>
+    <div class="alert alert-warning" *ngIf="rcirReportData && rcirReportData.labels.length == 0">No Data found</div>
+    <canvas id="myChart"></canvas>
+    <!-- <canvas baseChart *ngIf="pieReportData" [data]="pieChartData" [labels]="pieChartLabels" [chartType]="pieChartType"
+      [options]="pieChartOptions" [legend]="true">
+    </canvas>
+    <canvas id="crirReportData" *ngIf="crirReportData && crirReportData.labels.length > 0" baseChart
+      [datasets]="lineChartData" [labels]="lineLabels" [options]="lineChartOptions" [legend]="true"
+      [chartType]="'line'">
+    </canvas>
+    <canvas id="rcirReportData" *ngIf="rcirReportData && rcirReportData.labels.length > 0" baseChart
+      [datasets]="lineChartData" [labels]="lineLabels" [options]="lineChartOptions" [legend]="true"
+      [chartType]="'line'">
+    </canvas> -->
+    <div class="alert alert-warning" *ngIf="ttrReportData && ttrReportData.length == 0">No Data found</div>
+    <table class="table table-hover table-condensed dataTable no-footer" role="grid" *ngIf="ttrReportData">
+      <thead>
+        <tr role="row">
+          <th>Ticket</th>
+          <th>Estimate</th>
+          <th>Logged</th>
+          <th style="width:15%"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr role="row" *ngFor="let r of ttrReportData.series">
+          <td>{{r.key}}</td>
+          <td *ngIf="r.estimate > 0">{{r.estimate}}m ( {{r.estimateString}})</td>
+          <td *ngIf="r.estimate <= 0"> - </td>
+          <td *ngIf="r.timeSpent > 0">{{r.timeSpent}}m ( {{r.timeSpentString}})</td>
+          <td *ngIf="r.timeSpent <= 0"> - </td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

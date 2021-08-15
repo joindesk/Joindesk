@@ -1,0 +1,21 @@
+<div class="card card-transparent">
+    <div class="card-header">
+        <div class="card-title">
+            <h3>checkpoint</h3>
+        </div>
+    </div>
+    <div class="card-body">
+        <form (submit)="makeTransition()">
+            <div class="form-group" *ngFor="let field of fields">
+                <label>{{field.label}}</label>
+                <select id="{{field.label}}" name="{{field.label}}" class="form-control" required
+                    [(ngModel)]="field.value">
+                    <option *ngFor="let v of field.values" value="{{v.id}}">{{v.name}}</option>
+                </select>
+            </div>
+            <div class="text-right m-t-20">
+                <button class="btn btn-primary" type="submit"><app-icon height="18" width="18" icon="arrow-right-short"> </app-icon></button>
+            </div>
+        </form>
+    </div>
+</div>

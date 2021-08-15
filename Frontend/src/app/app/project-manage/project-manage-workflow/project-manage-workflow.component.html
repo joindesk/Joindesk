@@ -1,0 +1,39 @@
+<nz-page-header class="manageAreaHeader" nzTitle="Workflow">
+  <nz-page-header-extra>
+    <button nz-button routerLink="edit/create">Create</button>
+  </nz-page-header-extra>
+</nz-page-header>
+<div class="m-0 mt-4 row">
+  <div class="col-4">
+    <nz-table class="issueTable" nzShowPagination="false" *ngIf="workflows" #workflowsTable [nzData]="workflows"
+      nzPageSize="999999" [nzNoResult]="createDocTemp">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <!-- <th>Description</th> -->
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let w of workflowsTable.data">
+          <td class="v-align-middle semi-bold">
+            {{w.name}}
+          </td>
+          <!-- <td class="v-align-middle">{{w.description}}
+          </td> -->
+          <td>
+            <a [routerLink]="[w.id]" routerLinkActive="active" class="btn btn-default pull-right">
+              <app-icon height="18" width="18" icon="arrow-right-short"> </app-icon>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+      <ng-template #createDocTemp>
+        <img src="/assets/img/empty.svg" class="jdempty" width="200">
+      </ng-template>
+    </nz-table>
+  </div>
+  <div class="col-8">
+    <router-outlet></router-outlet>
+  </div>
+</div>

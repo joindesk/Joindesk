@@ -1,0 +1,92 @@
+<nz-steps [nzCurrent]="0" *ngIf="transition" class="noStepIcon">
+  <nz-step [nzStatus]="process" [nzTitle]="fromStep"></nz-step>
+  <nz-step [nzStatus]="process" [nzTitle]="transitionName"></nz-step>
+  <nz-step [nzStatus]="process" [nzTitle]="toStep"></nz-step>
+</nz-steps>
+<ng-template #fromStep>
+  <span *ngIf="!transition.fromAll"
+    class="issueStatus issueStatus-{{transition.fromStep.issueStatus.issueLifeCycle}}">{{transition.fromStep.issueStatus.name}}</span>
+  <span *ngIf="transition.fromAll" class="issueStatus issueStatus-ALL">ALL</span>
+</ng-template>
+<ng-template #transitionName>
+  {{transition.name}}
+</ng-template>
+<ng-template #toStep>
+  <span
+    class="issueStatus issueStatus-{{transition.toStep.issueStatus.issueLifeCycle}}">{{transition.toStep.issueStatus.name}}</span>
+</ng-template>
+<nz-tabset class="mt-5" nzTabPosition="left" (nzSelectChange)="tabChanged($event)">
+  <nz-tab *ngFor="let t of types" [nzTitle]="t.key">
+    <table class="table table-hover dataTable no-footer" *ngIf="transitions">
+      <tbody>
+        <tr *ngFor="let tr of getTransitions(t.key)">
+          <td>{{tr.subType}}</td>
+          <td>{{tr.key}}</td>
+          <td>{{tr.displayValue}}</td>
+          <td class="cursorpointer" (click)="removeTransitionProperty(tr)">
+            <app-icon height="20" width="20" icon="trash"></app-icon>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="m-l-0 m-r-0 m-t-20 row">
+      <div class="col-4">
+        <div class="form-group form-group-default">
+          <label>ADD {{t.key}}</label>
+          <mat-select (selectionChange)="changeSubType(t,$event)" name="subType" [(ngModel)]="model.subType">
+            <mat-option [value]=""></mat-option>
+            <mat-option *ngFor="let s of t.values" [value]="s">
+              {{s}}
+            </mat-option>
+          </mat-select>
+        </div>
+      </div>
+      <div class="col-6" *ngIf="model.subType">
+        <form (ngSubmit)="addCondition()" #stepForm="ngForm" ngNativeValidate>
+          {{model.subType}}
+          <div *ngIf="model.fields">
+            <div class="form-group" *ngIf="model.fields.type === 'select'">
+              <label>{{model.fields.label}}</label>
+              <nz-select name="{{model.subType}}" nzPlaceHolder="Please select" [(ngModel)]="model.subTypeKey">
+                <nz-option *ngFor="let option of model.fields.values" [nzLabel]="option.value" [nzValue]="option.key">
+                </nz-option>
+              </nz-select>
+            </div>
+            <div class="form-group" *ngIf="model.fields.type === 'select-multiple'">
+              <nz-select name="{{model.subType}}" nzMode="multiple" nzPlaceHolder="Please select"
+                [(ngModel)]="model.subTypeKey">
+                <nz-option *ngFor="let option of model.fields.values" [nzLabel]="option.value" [nzValue]="option.key">
+                </nz-option>
+              </nz-select>
+              <select name="condition_{{model.subTypeKey}}" class="form-control hide" [(ngModel)]="model.condition"
+                required>
+                <option value="OR">ANY OF BELOW</option>
+                <option disabled value="AND">ALL OF BELOW</option>
+              </select>
+            </div>
+            <div class="form-group" *ngIf="model.fields.type === 'sub-select'">
+              <label>{{model.fields.label}}</label>
+              <nz-select name="{{model.subType}}" nzPlaceHolder="Please select" [(ngModel)]="model.subTypeKey">
+                <nz-option *ngFor="let option of model.fields.subFields" [nzLabel]="option.label" [nzValue]="option">
+                </nz-option>
+              </nz-select>
+              <div *ngIf="model.subTypeKey">
+                <div class="form-group" *ngIf="model.subTypeKey.type === 'select'">
+                  <label>Value</label>
+                  <select name="{{model.subTypeKey}}" class="form-control" [(ngModel)]="model.subTypeValue" required>
+                    <option value=""></option>
+                    <option value="-none-">--None--</option>
+                    <option *ngFor="let sf of model.subTypeKey.values" [ngValue]="sf.key">{{sf.value}}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-primary" type="submit">Add</button>
+          </div>
+        </form>
+      </div>
+      <div class="col-2"></div>
+    </div>
+  </nz-tab>
+</nz-tabset>
+<div *nzModalFooter></div>

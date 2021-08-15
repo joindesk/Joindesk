@@ -1,0 +1,121 @@
+<nz-page-header [nzGhost]="false" nzTitle="Webhook">
+  <nz-page-header-extra>
+    <button nz-button nzType="primary" (click)="create()">Create</button>
+  </nz-page-header-extra>
+</nz-page-header>
+<div class="m-0 mt-4 row">
+  <div class="col-6">
+    <nz-table class="issueTable" *ngIf="hooks" #hooksTable [nzData]="hooks" nzPageSize="999999"
+      [nzNoResult]="createDocTemp" nzShowPagination="false">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th class="text-center">Active</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of hooksTable.data">
+          <td class="v-align-middle semi-bold">
+            {{r.name}}
+          </td>
+          <td class="v-align-middle semi-bold">
+            {{r.endPoint}}
+          </td>
+          <td class="text-center semi-bold">
+            <app-icon height="20" width="20" icon="{{r.active ? 'check-circle': 'x-circle'}}"> </app-icon>
+          </td>
+          <td>
+            <a (click)="open(r)" class="btn btn-default btn-xs pull-right">
+              <app-icon height="20" width="20" icon="pencil"> </app-icon>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+      <ng-template #createDocTemp>
+        <img src="/assets/img/empty.svg" class="jdempty" width="200">
+      </ng-template>
+    </nz-table>
+  </div>
+  <div class="col-6">
+    <div class="card card-bordered" *ngIf="hook">
+      <div class="card-header">
+        <div class="card-title">
+          <span *ngIf="!hook.id">Create </span>{{hook.name}}
+        </div>
+      </div>
+      <div class="card-body">
+        <form (ngSubmit)="save(active,allCheck, allEventsCheck)" #issueTypeForm="ngForm" ngNativeValidate>
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" class="form-control" required name="name" [(ngModel)]="hook.name">
+          </div>
+          <div class="form-group">
+            <label>endPoint</label>
+            <input type="url" class="form-control" required name="endPoint" placeholder="https://example.com/hook"
+              [(ngModel)]="hook.endPoint">
+          </div>
+          <div class="form-group form-check">
+            <mat-slide-toggle #allEventsCheck [checked]="hook.allEvents">All Events ?</mat-slide-toggle>
+          </div>
+          <div class="form-group">
+            <label>Trigger for events</label>
+            <mat-select #v placeholder="Event Types" name="eventTypes" [(value)]="hook.eventTypes" multiple
+              [disabled]="allEventsCheck.checked">
+              <mat-option *ngFor="let a of eventTypes" [value]="a">{{a}}</mat-option>
+            </mat-select>
+          </div>
+          <div class="form-group form-check">
+            <mat-slide-toggle #active [checked]="hook.active">Active</mat-slide-toggle>
+          </div>
+          <div class="form-group form-check">
+            <mat-slide-toggle #allCheck [checked]="hook.allProjects">All Projects ?</mat-slide-toggle>
+          </div>
+          <div class="form-group">
+            <label>Trigger for projects</label>
+            <mat-select #pr placeholder="Projects" name="eventTypes" [compareWith]="compareFn"
+              [(ngModel)]="hook.projects" multiple [disabled]="allCheck.checked">
+              <mat-option *ngFor="let a of projects" [value]="a">{{a.name}}</mat-option>
+            </mat-select>
+          </div>
+          <div class="card card-bordered">
+            <div class="card-header">
+              <div class="card-title">
+                Headers
+              </div>
+              <app-icon height="20" width="20" icon="plus" class="pull-right cursorpointer" (click)="addHeader()">
+              </app-icon>
+            </div>
+            <div class="card-body">
+              <div class="row" *ngFor="let h of hook.requestHeaders;index as i">
+                <div class="col-5">
+                  <div class="form-group">
+                    <input type="text" class="form-control" required placeholder="Header Name" name="headerName-{{i}}"
+                      [(ngModel)]="h.key">
+                  </div>
+                </div>
+                <div class="col-5">
+                  <div class="form-group">
+                    <input type="text" class="form-control" required name="headerVal-{{i}}" placeholder="Header Value"
+                      [(ngModel)]="h.value">
+                  </div>
+                </div>
+                <div class="col-2">
+                  <button class="btn btn-danger" (click)="removeHeader(i)">
+                    <app-icon height="16" width="16" icon="trash"></app-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="ml-1" nz-button nzType="primary" *ngIf="!hook.id">Create</button>
+          <button type="submit" class="ml-1" nz-button nzType="primary" *ngIf="hook.id">Update</button>
+          <button type="button" class="ml-1" nz-button nzType="danger" (click)="delete()"
+            *ngIf="hook.id">Delete</button>
+          <button type="button" (click)="cancel()" class="ml-1" nz-button nzType="default">Cancel</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

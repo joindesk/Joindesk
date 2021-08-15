@@ -1,0 +1,49 @@
+package com.ariseontech.joindesk.auth.domain;
+
+public enum AuthorityCode {
+
+    PROJECT_MANAGE,
+
+    PROJECT_VIEW,
+
+    ISSUE_ASSIGN,
+
+    ISSUE_CREATE,
+
+    ISSUE_EDIT,
+
+    ISSUE_DELETE,
+
+    ISSUE_LINK,
+
+    ISSUE_MODIFY_REPORTER,
+
+    ISSUE_MOVE,
+
+    ISSUE_TRANSITION,
+
+    COMMENT_ADD,
+
+    COMMENT_DELETE_ALL,
+
+    COMMENT_DELETE_OWN,
+
+    COMMENT_EDIT_ALL,
+
+    COMMENT_EDIT_OWN,
+
+    ATTACHMENT_CREATE,
+
+    ATTACHMENT_DELETE_ALL,
+
+    ATTACHMENT_DELETE_OWN,
+
+    LOG_WORK,
+
+    WIKI_VIEW,
+
+    WIKI_EDIT,
+
+    WIKI_DELETE
+
+}

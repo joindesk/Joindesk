@@ -1,0 +1,15 @@
+<nz-page-header class="calendarHeader" nzTitle="Calendar">
+    <nz-page-header-extra>
+        <nz-page-header-tags>
+            <nz-tag nzColor="blue">Only issues with Start and/or End date will be displayed</nz-tag>
+        </nz-page-header-tags>
+    </nz-page-header-extra>
+</nz-page-header>
+<div class="m-4">
+    <!-- <full-calendar class="card-calendar" #calendar defaultView="dayGridMonth" [plugins]="calendarPlugins"
+        [weekends]="true" [events]="events" (eventClick)="eventClicked($event)" (datesRender)="renderDate($event)"
+        themeSystem="bootstrap" [droppable]="true" [editable]="true" (eventDragStop)="console.log($event)"
+        (eventResizeStop)="console.log($event)">
+    </full-calendar> -->
+    <full-calendar class="card-calendar" [options]='calendarOptions'></full-calendar>
+</div>

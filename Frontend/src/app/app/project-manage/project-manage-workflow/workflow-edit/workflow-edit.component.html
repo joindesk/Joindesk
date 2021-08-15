@@ -1,0 +1,170 @@
+<div class="card card-bordered" *ngIf="workflow">
+  <div class="card-header">
+    <button routerLink="../../{{workflow.id}}" class="pull-right p-0" nz-button nzType="default">
+      <app-icon height="20" width="20" icon="x"></app-icon>
+    </button>
+  </div>
+  <div class="card-body">
+    <form (ngSubmit)="save()" #workflowForm="ngForm" ngNativeValidate>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" class="form-control" required name="groupName" placeholder="Name"
+          [(ngModel)]="workflow.name">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" class="form-control" required name="groupDescription" placeholder="Description"
+          [(ngModel)]="workflow.description">
+      </div>
+      <div class="form-group" *ngIf="workflow.id">
+        <label>Default Step</label>
+        <nz-select name="defaultStep" [(ngModel)]="workflow.defaultStep" [compareWith]="compareFn">
+          <nz-option *ngFor="let a of workflow.workflowSteps" [nzLabel]="a.issueStatus.name" [nzValue]="a"></nz-option>
+        </nz-select>
+      </div>
+      <button nz-button nzType="primary" type="submit" *ngIf="!workflow.id">Create</button>
+      <button nz-button nzType="primary" type="submit" *ngIf="workflow.id">Update</button>
+      <button nz-button nzType="default" routerLink="../../{{workflow.id}}">Cancel</button>
+    </form>
+    <app-workflow-preview *ngIf="workflow.id > 0" [w]="workflow"></app-workflow-preview>
+    <div class="row m-t-40" *ngIf="workflow.id">
+      <table class="table table-hover dataTable no-footer">
+        <thead>
+          <tr>
+            <th>Step <button nz-button nzType="dashed" nzShape="circle" (click)="showAddStep = true" class="ant-btn">
+                <app-icon height="18" width="18" icon="plus"></app-icon>
+              </button></th>
+            <th>Category</th>
+            <th>Transitions <button nz-button nzType="dashed" nzShape="circle" (click)="showAddTransition = true"
+                class="ant-btn">
+                <app-icon height="18" width="18" icon="plus"></app-icon>
+              </button></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let wst of workflow.workflowStepTransitions">
+            <td class="align-middle">
+              <span
+                class="issueStatus issueStatus-{{wst.step.issueStatus.issueLifeCycle}}">{{wst.step.issueStatus.name}}</span>
+            </td>
+            <td class="align-middle">
+              {{wst.step.issueStatus.issueLifeCycle}}
+            </td>
+            <td class="align-middle p-1">
+              <ul class="list-group">
+                <li class="list-group-item p-1" *ngFor="let wt of wst.workflowTransitions">
+                  <a (click)="openTransition(wt.id)" style="text-decoration: underline;cursor: pointer;">{{wt.name}}</a>
+                  <span class="pull-right">
+                    <app-icon height="18" width="18" icon="x" (click)="removeTransition(wt.id)"></app-icon>
+                  </span>
+                  <p class="m-0">
+                    <app-icon height="18" width="18" icon="arrow-return-right"></app-icon>
+                    {{wt.toStep.issueStatus.name}}
+                  </p>
+                </li>
+              </ul>
+            </td>
+            <td class="align-middle">
+              <span class="pull-right">
+                <app-icon height="18" width="18" icon="x" *ngIf="wst.step.id != workflow.defaultStep.id"
+                  (click)="removeStep(wst.step.id)"></app-icon>
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<nz-modal *ngIf="workflow" [(nzVisible)]="showAddStep" nzTitle="Add Step" (nzOnCancel)="showAddStep = false"
+  nzClassName="modal-no-footer">
+  <form nz-form [nzLayout]="'vertical'" (ngSubmit)="saveStep()" #stepForm="ngForm" ngNativeValidate>
+    <nz-form-item>
+      <nz-form-label nzFor="isStatus">Status</nz-form-label>
+      <nz-form-control>
+        <nz-select id="isStatus" id="isStatus" [(ngModel)]="model.status" name="IStatus2" nzPlaceHolder="Choose Status"
+          (ngModelChange)="changeStatus($event)">
+          <nz-option nzValue="new" nzLabel="-- New Status --"></nz-option>
+          <nz-option *ngFor="let s of issueTypeService.issueStatus" [nzLabel]="s.name" [nzValue]="s">
+          </nz-option>
+        </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+    <div class="form-group form-group-default" *ngIf="model.status == 'new'">
+      <label>Step name</label>
+      <input type="text" name="stepN" required class="form-control" [(ngModel)]="issueStatus.name">
+    </div>
+    <div class="form-group form-group-default" *ngIf="model.status == 'new'">
+      <label>Category</label>
+      <select name="fromStepT" required [(ngModel)]="issueStatus.issueLifeCycle" class="form-control">
+        <option value="TODO">TODO</option>
+        <option value="INPROGRESS">IN PROGRESS</option>
+        <option value="DONE">DONE</option>
+        <option value="REVIEW">REVIEW</option>
+        <option value="ALERT">ALERT</option>
+        <option value="HIGHLIGHT">HIGHLIGHT</option>
+      </select>
+    </div>
+    <!-- <nz-select name="stepCategory" nzShowSearch nzAllowClear nzPlaceHolder="Category" *ngIf="model.status == 'new'"
+        [(ngModel)]="issueStatus.issueLifeCycle">
+        <nz-option nzCustomContent nzLabel="PENDING" nzValue="PENDING"><span class="status-TODO">&nbsp;</span>
+          PENDING
+        </nz-option>
+        <nz-option nzCustomContent nzLabel="INPROGRESS" nzValue="INPROGRESS"><span
+            class="status-INPROGRESS">&nbsp;</span>
+          IN PROGRESS
+        </nz-option>
+        <nz-option nzCustomContent nzLabel="DONE" nzValue="DONE"><span class="status-DONE">&nbsp;</span>
+          COMPLETE
+        </nz-option>
+      </nz-select> -->
+    <nz-form-item>
+      <nz-form-control>
+        <button type="submit" nz-button nzType="primary" [disabled]="!model.status">Add Step</button>
+      </nz-form-control>
+    </nz-form-item>
+  </form>
+  <div *nzModalFooter></div>
+</nz-modal>
+<nz-modal *ngIf="workflow" [(nzVisible)]="showAddTransition" nzTitle="Add Transition"
+  (nzOnCancel)="showAddTransition = false" nzClassName="modal-no-footer">
+  <form (ngSubmit)="saveTransition()" #transitionForm="ngForm" ngNativeValidate>
+    <div class="row">
+      <div class="form-group form-group-default">
+        <label>Transition name</label>
+        <input type="text" name="tN" name="Start design" required class="form-control" [(ngModel)]="transition.name">
+      </div>
+      <div class="form-group form-group-default hide">
+        <label>Transition description</label>
+        <input type="text" name="tD" class="form-control" [(ngModel)]="transition.description">
+      </div>
+      <div class="form-group form-group-default">
+        <label>From Step</label>
+        <div class="row">
+          <div class="col-4">
+            <nz-switch name="tFromAll" nzCheckedChildren="Any" nzUnCheckedChildren="Selected"
+              [(ngModel)]="transition.fromAll">
+            </nz-switch>
+          </div>
+          <div class="col-8">
+            <nz-select *ngIf="!transition.fromAll" [(ngModel)]="transition.fromStep" name="fromStepT"
+              nzPlaceHolder="Choose From Step">
+              <nz-option *ngFor="let s of workflow.workflowSteps" [nzLabel]="s.issueStatus.name" [nzValue]="s">
+              </nz-option>
+            </nz-select>
+          </div>
+        </div>
+      </div>
+      <div class="form-group form-group-default">
+        <label>To Step</label>
+        <nz-select [(ngModel)]="transition.toStep" name="toStepT" nzPlaceHolder="Choose To Step">
+          <nz-option *ngFor="let s of workflow.workflowSteps" [nzLabel]="s.issueStatus.name" [nzValue]="s">
+          </nz-option>
+        </nz-select>
+      </div>
+      <button type="submit" nz-button nzType="primary">Add Transition</button>
+    </div>
+  </form>
+  <div *nzModalFooter></div>
+</nz-modal>

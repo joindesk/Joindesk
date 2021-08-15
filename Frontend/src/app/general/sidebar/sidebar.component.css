@@ -1,0 +1,15 @@
+.menuExpand {
+    transform: translate(210px, 0px) !important;
+}
+
+.menu-title {
+    padding-left: 30px;
+}
+
+.icon-thumbnail {
+    margin-right: 0px;
+}
+
+span.icon-thumbnail:focus {
+    outline-color: white;
+}

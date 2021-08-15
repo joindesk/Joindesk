@@ -1,0 +1,40 @@
+<nz-page-header class="ganttHeader" nzTitle="Gantt">
+    <nz-page-header-extra>
+        <nz-page-header-tags>
+            <nz-tag nzColor="blue">Only issues with Start and/or End date will be displayed</nz-tag>
+        </nz-page-header-tags>
+    </nz-page-header-extra>
+</nz-page-header>
+<div class="m-4">
+    <nz-skeleton [nzLoading]="loading" [nzActive]="true"></nz-skeleton>
+    <div class="gantt" *ngIf="!loading">
+        <div class="gantt__row gantt__row--months">
+            <div class="gantt__row-first">
+                <nz-month-picker nzAllowClear="false" [nzFormat]="'MMM yyyy'" class="ganttMonthPicker"
+                    style="z-index: 5;" name="monthSelect" (ngModelChange)="setMonth()" [(ngModel)]="currentMonth"
+                    nzPlaceHolder="Select month">
+                </nz-month-picker>
+            </div>
+            <span *ngFor="let d of days" [class.today]="d.today">{{d.date}}</span>
+        </div>
+        <div class="gantt__row gantt__row--lines">
+            <span></span>
+            <span *ngFor="let d of days" [class.marker]="d.day >= 6"></span>
+        </div>
+        <div class="gantt__row" *ngFor="let e of users | keyvalue"
+            [class.gantt__row--empty]="!events[e.key] || events[e.key].length <= 0">
+            <div class="gantt__row-first">
+                <app-usermedia *ngIf="e" [tooltip]="e.value.fullName" [s]="'d24'" [pic]="e.value.pic" [user]="e.value">
+                </app-usermedia>
+                {{e.value.fullName}}
+            </div>
+            <ul class="gantt__row-bars">
+                <li *ngFor="let ev of events[e.key]" [style.grid-column-start]="ev.grid_column_start"
+                    [style.grid-column-end]="ev.grid_column_end" (click)="openIssue(ev.id)"
+                    class="issueStatus issueStatus-{{ev.issueLifeCycle}}" nz-tooltip [nzTooltipTitle]="ev.title"
+                    nzTooltipPlacement="topLeft">
+                    {{ev.title}}</li>
+            </ul>
+        </div>
+    </div>
+</div>

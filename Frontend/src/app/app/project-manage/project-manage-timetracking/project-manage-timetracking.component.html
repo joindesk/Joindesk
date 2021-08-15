@@ -1,0 +1,44 @@
+<div *ngIf="timetracking">
+  <div class="row">
+    <div class="col-12">
+      <h3>Time tracking is
+        <span *ngIf="timetracking.enabled">Enabled</span>
+        <span *ngIf="!timetracking.enabled">Disabled</span>
+      </h3>
+      <form class="m-t-30" (ngSubmit)="save()" #issueTypeForm="ngForm" ngNativeValidate>
+        <div class="form-group row">
+          <label for="hoursperday" class="col-md-3 control-label">Hours per day</label>
+          <div class="col-md-9">
+            <input type="number" [(ngModel)]="timetracking.hoursPerDay" class="form-control" id="hoursperday" min="1"
+              max="24" name="hoursperday" required="" aria-required="true">
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="daysperweek" class="col-md-3 control-label">Days per week</label>
+          <div class="col-md-9">
+            <input type="number" [(ngModel)]="timetracking.daysPerWeek" class="form-control" min="1" max="7"
+              id="daysperweek" name="daysperweek" required="" aria-required="true">
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="timeFormat" class="col-md-3 control-label">Display format</label>
+          <div class="col-md-9">
+            <select class="form-control" [(ngModel)]="timetracking.timeFormat" id="timeFormat" name="timeFormat"
+              required="" aria-required="true">
+              <option value="0">1 week, 2 days, 4 hours</option>
+              <option value="1">36 hours</option>
+            </select>
+          </div>
+        </div>
+        <br />
+        <div class="row">
+          <div class="col-md-3"></div>
+          <div class="col-md-9">
+            <button nz-button nzType="primary" type="submit" *ngIf="!timetracking.enabled">Enable</button>
+            <button nz-button nzType="danger" type="submit" *ngIf="timetracking.enabled">Disable</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

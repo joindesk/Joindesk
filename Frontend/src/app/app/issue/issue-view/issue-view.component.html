@@ -1,0 +1,630 @@
+<div class="content" (drop)="dropHandler($event)" (dragover)="dragOverHandler($event)" (dragend)="onDragEnd($event)">
+  <div class="inner-content full-height m-0">
+    <div *ngIf="issue && !issueLoading && !issueError" style="overflow: hidden;">
+      <nz-affix [nzOffsetTop]="60">
+        <nz-page-header [nzGhost]="false" class="issueHeader">
+          <nz-page-header-title class="issueTitle" (mouseenter)="showIcon['issue'] = true"
+            (mouseleave)="showIcon['issue'] = false">
+            <a *ngIf="!isModal" class="greyA mr-2" routerLink="/project/{{projectKey}}"><i nz-icon nzType="arrow-left"
+                nzTheme="outline"></i></a>
+            <span *ngIf="!isModal">{{issue.project.key}}-{{issue.key}}</span>
+            <a *ngIf="isModal" class="greyA ml-2" style="font-size: 1.2rem;"
+              routerLink="/issue/{{issue.project.key}}-{{issue.key}}">{{issue.project.key}}-{{issue.key}} <app-icon
+                class="ml-2 mr-1" style="color: #b3b3b3;" height="18" width="18" icon="arrows-angle-expand"></app-icon>
+            </a>
+            <a *ngIf="showIcon['issue']" nz-tooltip nzTooltipTitle="Click to copy" (click)="copyLink(0)">
+              <app-icon class="ml-1" height="15" width="15" style="color:#a5a5a5" icon="link-45deg">
+              </app-icon>
+            </a>
+          </nz-page-header-title>
+          <nz-page-header-extra class="issueTitleExtra">
+            <button nz-button nzType="dashed" nz-dropdown [nzBackdrop]="false" nzTrigger="click"
+              [nzDropdownMenu]="issueTypeMenu"><i class="issueType fa fa-{{issue.issueType.iconUrl}}"></i>
+              {{issue.issueType.name}}</button>
+            <nz-dropdown-menu #issueTypeMenu="nzDropdownMenu">
+              <ul nz-menu nzSelectable>
+                <li *ngFor="let w of issueTypeService.issueTypes" [nzDisabled]="w.id == issue.issueType.id"
+                  (click)="updateIssueType(w)" nz-menu-item>
+                  {{w.name}}
+                </li>
+              </ul>
+            </nz-dropdown-menu>
+            <nz-divider nzType="vertical"></nz-divider>
+            <button class="hide" nz-button (click)="clone()" nzType="dashed">Copy</button>
+            <button nz-button nz-dropdown nzTrigger="click" [nzDropdownMenu]="watchersMenu" nzType="dashed"
+              nzBackdrop="false"><i nz-icon nzType="eye" [nzTheme]="watching ? 'fill': 'outline'"></i>
+              {{this.issue.watchers.length}}</button>
+            <nz-dropdown-menu #watchersMenu="nzDropdownMenu">
+              <ul nz-menu nzSelectable>
+                <li nz-menu-item [nzDisabled]="watchloading" (click)="watch(0)" *ngIf="watching">Stop Watching</li>
+                <li nz-menu-item [nzDisabled]="watchloading" (click)="watch(1)" *ngIf="!watching">Start Watching</li>
+                <li nz-menu-divider></li>
+                <li *ngFor="let w of issue.watchers" nz-menu-item>
+                  {{w.watcher.fullName}}
+                </li>
+              </ul>
+            </nz-dropdown-menu>
+            <button *ngIf="issue.permissions.delete" nz-button (click)="delete()" nzType="dashed"><i nz-icon
+                nzType="delete" nzTheme="outline"></i></button>
+            <button nz-button nzType="dashed" class="hide"><i nz-icon nzType="ellipsis" nzTheme="outline"></i></button>
+          </nz-page-header-extra>
+        </nz-page-header>
+      </nz-affix>
+      <div nz-row id="issue-area" class="pl-2 pr-3 pb-2" style="overflow: hidden;">
+        <div nz-col nzSpan="16" class="pl-2 pr-4">
+          <nz-spin [nzIndicator]="spinnerIndicatorTemplate" [nzSpinning]="fieldLoading.summary">
+            <app-inline-edit [editable]="issue.permissions.edit"
+              [data]="{'issueKey':issue.key,'projectKey':issue.project.key,'field':'summary','value':issue.summary}"
+              (saveEvent)="saveEditable($event)" (changeEvent)="inlineItemChange($event)"></app-inline-edit>
+          </nz-spin>
+          <div class="mt-1 mb-5 pl-2">
+            <button class="issueQuickButtons p-2" nz-button nzType="dashed" nz-tooltip nzTooltipTitle="Attach"
+              *ngIf="issue.permissions.attach" (click)="fileInput.click()"><img
+                src="/assets/img/icon-attach.svg"></button>
+            <button nz-tooltip nzTooltipTitle="Log work" class="issueQuickButtons p-2" nz-button nzType="dashed"
+              *ngIf="issue.project.timeTracking.enabled" (click)="createNewWorkLogDialog()">
+              <img src="/assets/img/icon-time.svg"></button>
+            <!-- <button nz-tooltip nzTooltipTitle="Add Link" class="issueQuickButtons p-2" nz-button nzType="dashed"
+              *ngIf="issue.permissions.link" (click)="showAddLink = true; scroll(linkView);">
+              <img src="/assets/img/icon-link.svg"></button> -->
+            <nz-button-group>
+              <button nz-tooltip nzTooltipTitle="Add Link" class="issueQuickButtons p-2 mr-0" nz-button nzType="dashed"
+                *ngIf="issue.permissions.link" (click)="showAddLink = true; scroll(linkView);"><img
+                  src="/assets/img/icon-link.svg"></button>
+              <button class="issueQuickButtons p-2" nz-button nz-dropdown [nzDropdownMenu]="addLinkMenu"
+                nzPlacement="bottomRight" nzType="dashed">
+                <i nz-icon nzType="down"></i>
+              </button>
+            </nz-button-group>
+            <nz-dropdown-menu #addLinkMenu="nzDropdownMenu">
+              <ul nz-menu>
+                <li (click)="showAddwebLinkModal()" nz-menu-item>Add web link</li>
+              </ul>
+            </nz-dropdown-menu>
+            <button nz-tooltip nzTooltipTitle="Add Checklist" class="issueQuickButtons p-2" nz-button nzType="dashed"
+              *ngIf="issue.permissions.edit" (click)="showAddTask = true; scroll(taskView);">
+              <img src="/assets/img/icon-tasks.svg"></button>
+          </div>
+          <h5 class="hint-head font-roboto m-b-0 small mb-2">Description</h5>
+          <nz-spin [nzIndicator]="spinnerIndicatorTemplate" [nzSpinning]="fieldLoading.description">
+            <!-- <app-inline-edit [editable]="issue.permissions.edit"
+              [data]="{'issueKey':issue.key,'projectKey':issue.project.key,'field':'description','value':issue.description,'renderedValue':issue.renderedDescription}"
+              (saveEvent)="saveEditable($event)" [notifier]="issueChange" [mention]="descMention"
+              (changeEvent)="inlineItemChange($event)"></app-inline-edit> -->
+            <app-jd-editor [editable]="issue.permissions.edit" [field]="'desc'" [type]="'edit'"
+              [desc]="issue.description" [issue]="issue" (save)="saveDesc($event)">
+            </app-jd-editor>
+          </nz-spin>
+          <!-- Custom Fields start -->
+          <div class="row" style="clear: both;">
+            <div class="col-6" *ngFor="let cf of issue.customFields">
+              <app-customfield-inline [editable]="issue.permissions.edit" [issue]="issue" [field]="cf"
+                (saveEvent)="saveEditable($event)"></app-customfield-inline>
+            </div>
+          </div>
+          <!-- Custom Fields end -->
+          <span #taskView></span>
+          <div class="mt-4" *ngIf="(tasks && tasks.length > 0) || showAddTask">
+            <div class="row mt-4">
+              <div class="col-5">
+                <h5 class="hint-head font-roboto mt-4 small mb-2">Checklist</h5>
+              </div>
+              <div class="col-7 text-right mt-4">
+                {{getTaskPercentage()}}% completed
+                <div class="progress progress-small m-0">
+                  <div class="progress-bar progress-bar-info" [style.width.%]="getTaskPercentage()"></div>
+                </div>
+              </div>
+            </div>
+            <nz-table *ngIf="tasks && tasks.length > 0" class="taskTbl" nzShowPagination="false" nzPageSize="999999"
+              #taskTable [nzData]="tasks">
+              <tbody cdkDropList (cdkDropListDropped)="reOrderTask($event)">
+                <tr class="taskDrag" cdkDrag *ngFor="let task of taskTable.data | taskFilter"
+                  (mouseenter)="showIcon['task-'+task.id] = true" (mouseleave)="showIcon['task-'+task.id] = false"
+                  [attr.data-task]="task.id">
+                  <td>
+                    <img src="/assets/img/icon-check-o.svg" *ngIf="!task.completed" (click)="completeTask(task, true)">
+                    <img src="/assets/img/icon-check.svg" *ngIf="task.completed" (click)="completeTask(task, false)">
+                  </td>
+                  <td [class.linethrough]="task.completed">{{task.summary}}</td>
+                  <td>
+                    <i *ngIf="showIcon['task-'+task.id]" class="cursorpointer pull-right" nz-icon nzType="delete"
+                      (click)="deleteTask(task)" nzTheme="outline"></i>
+                  </td>
+                  <td cdkDragHandle>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                      <path fill="none" d="M0 0h24v24H0V0z" />
+                      <path fill="lightgray"
+                        d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                    </svg>
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
+            <form (submit)="addTask()" ngNativeValidate *ngIf="issue.permissions.edit">
+              <i class="cursorpointer taskIcon fa fa-circle-o"
+                style="width: 2rem;padding: 10px 12px !important;font-size: 1.3rem;"></i>
+              <input style="width:75%" nz-input placeholder="task" id="taskInput" maxlength="500" required
+                name="taskInpt" [(ngModel)]="taskInput" />
+            </form>
+          </div>
+          <span #linkView></span>
+          <div
+            *ngIf="((issue.issueRelationships && issue.issueRelationships.length > 0) || (issue.issueMentions && issue.issueMentions.length > 0) || showAddLink) && issue.permissions.link">
+            <h5 id="Links" class="hint-head font-roboto mt-5 small mb-2">Links</h5>
+            <nz-table *ngIf="issue.issueRelationships && issue.issueRelationships.length > 0" nzPageSize="999999"
+              class="issueLinksTbl pl-2" nzShowPagination="false" #linksTable [nzData]="issue.issueRelationships">
+              <tbody>
+                <tr *ngFor="let data of linksTable.data" class="linksRow"
+                  (mouseenter)="showIcon['link-'+data.id] = true" (mouseleave)="showIcon['link-'+data.id] = false">
+                  <td *ngIf="isOutward(data)">{{data.type.outwardDesc}}</td>
+                  <td *ngIf="isInward(data)">{{data.type.inwardDesc}}</td>
+                  <td *ngIf="isOutward(data)">[{{data.toIssue.project.key}}-{{data.toIssue.key}}]</td>
+                  <td *ngIf="isInward(data)">[{{data.fromIssue.project.key}}-{{data.fromIssue.key}}]</td>
+                  <td *ngIf="isOutward(data)"><a
+                      routerLink="/issue/{{data.toIssue.project.key}}-{{data.toIssue.key}}">{{data.toIssue.summary}}</a>
+                  <td *ngIf="isInward(data)"><a
+                      routerLink="/issue/{{data.fromIssue.project.key}}-{{data.fromIssue.key}}">{{data.fromIssue.summary}}</a>
+                  </td>
+                  <td style="min-width: 30px;">
+                    <i *ngIf="showIcon['link-'+data.id]" nz-icon nzType="delete" nzTheme="outline"
+                      class="cursorpointer pull-right" (click)="unlink(data)"></i>
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
+            <ul class="list-group m-t-10" *ngIf="issue.issueMentions && issue.issueMentions.length > 0">
+              <li class="list-group-item" *ngFor="let a of issue.issueMentions">
+                <div class="row">
+                  <div class="col-3">Mentioned in</div>
+                  <div class="col-9">
+                    <a routerLink="{{a.linkURL}}">{{a.linkURL}}
+                    </a>
+                  </div>
+                </div>
+              </li>
+            </ul>
+            <p class="linkNew pl-2" (click)="showAddLink = !showAddLink">
+              <i nz-icon nzType="link" nzTheme="outline"></i>
+              New Link
+            </p>
+            <form class="pl-2" nz-form (ngSubmit)="link()" ngNativeValidate *ngIf="showAddLink" nzLayout="inline">
+              <nz-form-item>
+                <nz-form-label>Type</nz-form-label>
+                <nz-form-control>
+                  <nz-select style="min-width:150px" name="linkType" required
+                    [(ngModel)]="newIssueRelationship.relationship">
+                    <nz-option *ngFor="let r of relationshipTypes" [nzValue]="r" [nzLabel]="r.name"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+              <nz-form-item>
+                <nz-form-label>Issue</nz-form-label>
+                <nz-form-control>
+                  <!-- <input name="linkSearch" [(ngModel)]="newIssueRelationship.dest" required nz-input
+                    placeholder="XXXX-123" #lvalue /> -->
+                  <nz-select style="width:10rem" name="issueLinkSelect" nzPlaceHolder="Select issue" nzAllowClear
+                    nzShowSearch nzServerSearch [(ngModel)]="newIssueRelationship.dest"
+                    (nzOnSearch)="onIssueLinkSearch($event)" (nzFocus)="onIssueLinkSearch('')">
+                    <ng-container *ngFor="let o of issueLinkOptions">
+                      <nz-option *ngIf="!isLoading" [nzValue]="o.keyPair" [nzLabel]="o.keyPair +' '+o.summary ">
+                      </nz-option>
+                    </ng-container>
+                    <nz-option *ngIf="isLoading" nzDisabled nzCustomContent>
+                      <i nz-icon nzType="loading" class="loading-icon"></i> Loading...
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+              <nz-form-item>
+                <nz-form-control>
+                  <button nz-button nzType="primary">Link</button>
+                </nz-form-control>
+              </nz-form-item>
+            </form>
+          </div>
+          <div *ngIf="(issue.issueOtherRelationships && issue.issueOtherRelationships.length > 0)">
+            <h5 id="Links" class="hint-head font-roboto mt-5 small mb-2">Web Links</h5>
+            <nz-table *ngIf="issue.issueOtherRelationships && issue.issueOtherRelationships.length > 0"
+              nzPageSize="999999" class="issueLinksTbl pl-2" nzShowPagination="false" #weblinksTable
+              [nzData]="issue.issueOtherRelationships">
+              <tbody>
+                <tr *ngFor="let data of weblinksTable.data" class="linksRow"
+                  (mouseenter)="showIcon['wlink-'+data.id] = true" (mouseleave)="showIcon['wlink-'+data.id] = false">
+                  <td><a href="{{data.link}}" target="_blank">{{data.label}}</a></td>
+                  <td style="min-width: 30px;">
+                    <i *ngIf="showIcon['wlink-'+data.id]" nz-icon nzType="delete" nzTheme="outline"
+                      class="cursorpointer pull-right" (click)="removeWebLink(data)"></i>
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
+            <p class="linkNew pl-2" *ngIf="issue.permissions.link" (click)="showAddwebLinkModal()">
+              <i nz-icon nzType="link" nzTheme="outline"></i>
+              New web Link
+            </p>
+          </div>
+          <div class="mt-5" *ngIf="(issue.attachments && issue.attachments.length > 0) && issue.permissions.attach">
+            <h5 class="hint-head font-roboto mt-4 small mb-2">Attachments</h5>
+            <nz-table class="issueAttachmentTbl" nzShowPagination="false" nzPageSize="999999" #attachmentTable
+              [nzData]="issue.attachments">
+              <tbody>
+                <tr *ngFor="let a of attachmentTable.data" (mouseenter)="showIcon['att-'+a.id] = true"
+                  (mouseleave)="showIcon['att-'+a.id] = false">
+                  <td class="p-2">
+                    <div class="commentsWrapper">
+                      <img src="/assets/img/icon-attachment.svg" class="attachmentIcon">
+                      <div class="right">
+                        <a (click)="preview(a)" style="cursor: pointer;">
+                          <h5 class="m-0" style="font-family: Heebo;font-weight: 500;font-size: 14px;color: #001737;">
+                            {{a.originalName}}</h5>
+                        </a>
+                        <p class="m-0" style="font-size: 10px;color: #414141;font-weight: 500;">{{a.created | date}} by
+                          {{a.createdBy}}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td style="min-width: 60px;">
+                    <a *ngIf="showIcon['att-'+a.id]" class="pull-right attachmentExtra" (click)="detach(a)">
+                      <i nz-icon nzType="delete" nzTheme="outline"></i>
+                    </a>
+                    <a *ngIf="showIcon['att-'+a.id]" class="attachmentExtra pull-right"
+                      (click)="downloadFile(a.id, a.originalName)">
+                      <i nz-icon nzType="download" nzTheme="outline"></i>
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
+            <p class="linkNew pl-2" (click)="fileInput.click()"><i nz-icon nzType="paper-clip" nzTheme="outline"></i>
+              New File</p>
+          </div>
+          <input type="file" id="attachmentInpt" name="descAttachment" #fileInput (change)="attach($event)"
+            class="hide" />
+          <div class="row issueViewTabs mt-5" style="margin: 0;">
+            <nz-tabset style="width:100%" [nzTabBarExtraContent]="extraTemplate">
+              <nz-tab nzTitle="Comments" (nzSelect)="tabChange('Comments')">
+                <nz-skeleton [nzLoading]="commentsLoading" [nzAvatar]="true" [nzActive]="true"></nz-skeleton>
+                <p class="m-t-10 text-center" *ngIf="!commentsLoading && comments && comments.length <= 0">There are
+                  no comments yet on this issue.</p>
+                <div class="comments" *ngIf="!commentsLoading">
+                  <div class="mt-3" *ngFor="let a of comments" id="comment-{{a.id}}">
+                    <app-jd-editor [field]="'comment'" [type]="'edit'" [comment]="a" [user]="a.by" [issue]="issue"
+                      (save)="saveComment()" (triggerAttachment)="fileInput.click()">
+                    </app-jd-editor>
+                  </div>
+                </div>
+                <div class="mt-3 p-1 mb-4" id="comments-editor-wrapper"
+                  *ngIf="issue.permissions.comment && !commentsLoading">
+                  <app-jd-editor [field]="'comment'" [type]="'new'" [user]="myaccountService.user" [issue]="issue"
+                    (save)="saveComment()" (triggerAttachment)="fileInput.click()">
+                  </app-jd-editor>
+                </div>
+              </nz-tab>
+              <nz-tab nzTitle="History" (nzSelect)="tabChange('History')">
+                <nz-skeleton [nzLoading]="historyLoading" [nzActive]="true"></nz-skeleton>
+                <div class="comments" *ngIf="!historyLoading && issue.history && issue.history.length > 0">
+                  <div class="commentsWrapper mt-4" *ngFor="let a of issue.history">
+                    <div class="pl-2 pr-2">
+                      <app-usermedia [tooltip]="a.by.fullName" [user]="a.by" [s]="'d32 pull-right'" [pic]="a.by.pic">
+                      </app-usermedia>
+                    </div>
+                    <div class="rightArea">
+                      <p class="hTitle">{{a.by.fullName}}
+                        <span *ngIf="!a.summary && a.field != 'Issue created'">changed {{a.field}} </span>
+                        <span *ngIf="!a.summary && a.field == 'Issue created'">created issue </span>
+                        <span *ngIf="a.summary">{{a.summary}}</span>
+                        <span class="hDate" *ngIf="a.updated" nz-tooltip nzTooltipTitle="{{a.updated | date:'long'}}">
+                          {{a.updated| timeAgo}}</span>
+                      </p>
+                      <div class="hDiff" *ngIf="a.field != 'Issue created'">
+                        <div class="hCol">
+                          <span class="hTFix hNone" *ngIf="!a.oldValue || a.oldValue.length <= 0">None</span>
+                          <span class="hTFix" *ngIf="a.oldValue && a.oldValue.length > 0">{{a.oldValue}}</span>
+                        </div>
+                        <div class="hArr"><i nz-icon nzType="caret-right" nzTheme="outline"></i></div>
+                        <div class="hCol">
+                          <span class="hTFix hNone" *ngIf="!a.newValue || a.newValue.length <= 0">None</span>
+                          <span class="hTFix" *ngIf="a.newValue && a.newValue.length > 0">{{a.newValue}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </nz-tab>
+              <nz-tab nzTitle="Work Log" *ngIf="issue.project.timeTracking.enabled" (nzSelect)="tabChange('Work Log')">
+                <nz-skeleton [nzLoading]="workLogLoading" [nzActive]="true"></nz-skeleton>
+                <p class="m-t-10" *ngIf="!workLogLoading && issue.workLogs && issue.workLogs.length <= 0">
+                  <nz-empty [nzNotFoundContent]="noworklogcontentTpl" nzNotFoundImage="/assets/img/empty.svg"
+                    class="jdempty">
+                    <ng-template #noworklogcontentTpl>
+                      <span> There are no work logs yet on this issue.</span>
+                    </ng-template>
+                  </nz-empty>
+                </p>
+                <div class="comments" *ngIf="!workLogLoading && issue.workLogs && issue.workLogs.length > 0">
+                  <div class="commentsWrapper mt-3" *ngFor="let a of issue.workLogs">
+                    <div class="pl-2 pr-2">
+                      <app-usermedia [tooltip]="a.by.fullName" [user]="a.by" [s]="'d32 pull-right'" [pic]="a.by.pic">
+                      </app-usermedia>
+                    </div>
+                    <div class="rightArea">
+                      <p class="commentTitle">{{a.by.fullName}} <span class="text-muted">logged for</span> {{a.work}}
+                        <span class="text-muted" nz-tooltip nzTooltipTitle="{{a.workFrom | date:'long'}}">
+                          {{a.workFrom| timeAgo}}</span>
+                        <span class="text-muted" *ngIf="a.updated && a.created !== a.updated" nz-tooltip
+                          nzTooltipTitle="{{a.updated | date:'long'}}"> EDITED</span>
+                      </p>
+                      <p style="word-break: break-word;">{{a.workDescription}}</p>
+                      <span class="hint-text mt-10 small">
+                        <a style="cursor: pointer;" (click)="createWorkLogDialog(a)">Edit</a>&nbsp;&nbsp;
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </nz-tab>
+            </nz-tabset>
+            <ng-template #extraTemplate>
+              <i nz-icon (click)="changeSortDirection('desc')" *ngIf="sortDir == 'asc'" nz-tooltip
+                nzTooltipTitle="Ascending" nzType="sort-ascending" nzTheme="outline"></i>
+              <i nz-icon (click)="changeSortDirection('asc')" *ngIf="sortDir == 'desc'" nz-tooltip
+                nzTooltipTitle="Descending" nzType="sort-descending" nzTheme="outline"></i>
+            </ng-template>
+          </div>
+        </div>
+        <div nz-col nzSpan="8" class="mt-4 pl-2 issueSidebar">
+          <div class="issueStatusArea">
+            <nz-spin [nzIndicator]="spinnerIndicatorTemplate" [nzSpinning]="fieldLoading.transition">
+              <button nz-dropdown [nzDropdownMenu]="menu" type="button"
+                class="issueStatusOuter issueStatusOuter-{{issue.currentStep.issueStatus.issueLifeCycle}}"><span
+                  class="issueStatusInner"><span
+                    class="issueStatusText">{{issue.currentStep.issueStatus.name}}</span><span
+                    class="issueStatusIcon"><span><svg width="24" height="24" viewBox="0 0 24 24" focusable="false"
+                        role="presentation">
+                        <path
+                          d="M8.292 10.293a1.009 1.009 0 0 0 0 1.419l2.939 2.965c.218.215.5.322.779.322s.556-.107.769-.322l2.93-2.955a1.01 1.01 0 0 0 0-1.419.987.987 0 0 0-1.406 0l-2.298 2.317-2.307-2.327a.99.99 0 0 0-1.406 0z"
+                          fill="currentColor" fill-rule="evenodd"></path>
+                      </svg></span></span></span></button>
+              <nz-dropdown-menu #menu="nzDropdownMenu">
+                <ul nz-menu nzSelectable *ngIf="issue.possibleTransitions && issue.possibleTransitions.length > 0"
+                  style="min-width: 150px;max-height: 300px;overflow-y: scroll;border-radius: 4px 4px 0px 0px;">
+                  <li nz-menu-item *ngFor="let pt of issue.possibleTransitions" class="cursorpointer issueStatusLi"
+                    (click)="transition(pt.id)">
+                    <span
+                      class="m-1 issueStatus issueStatus-{{pt.toStep.issueStatus.issueLifeCycle}}">{{pt.name}}</span>
+                  </li>
+                </ul>
+                <ul nz-menu style="border-radius: 0px 0px 4px 4px;">
+                  <li nz-menu-item (click)="showWorkflowModal()">view workflow</li>
+                </ul>
+              </nz-dropdown-menu>
+              <span *ngIf="issue.resolution" class="issueResolution">
+                <app-icon height="18" width="18" icon="check"></app-icon> {{issue.resolution.name}}
+              </span>
+            </nz-spin>
+          </div>
+          <div class="card card-transparent" style="padding: 5px">
+            <p class="hint-head m-t-10 m-b-0 small">Assignee</p>
+            <nz-spin [nzIndicator]="spinnerIndicatorTemplate" [nzSpinning]="fieldLoading.assignee">
+              <app-inline-edit [editable]="issue.permissions.assign"
+                [data]="{'issueKey':issue.key,'projectKey':issue.project.key,'field':'assignee','value':issue.assignee}"
+                (saveEvent)="saveEditable($event)" (changeEvent)="inlineItemChange($event)"></app-inline-edit>
+            </nz-spin>
+          </div>
+          <div class="card card-transparent" style="padding: 5px">
+            <p class="hint-head m-t-10 m-b-0 small">Reporter</p>
+            <nz-spin [nzIndicator]="spinnerIndicatorTemplate" [nzSpinning]="fieldLoading.reporter">
+              <app-inline-edit [editable]="issue.permissions.reporter"
+                [data]="{'issueKey':issue.key,'projectKey':issue.project.key,'field':'reporter','value':issue.reporter}"
+                (saveEvent)="saveEditable($event)" (changeEvent)="inlineItemChange($event)"></app-inline-edit>
+            </nz-spin>
+          </div>
+          <div class="card card-transparent" style="padding: 5px"
+            *ngIf="issue.possibleVersions && issue.possibleVersions.length > 0">
+            <p class="hint-head m-t-10 m-b-0 small">Versions</p>
+            <nz-spin [nzIndicator]="spinnerIndicatorTemplate" [nzSpinning]="fieldLoading.versions">
+              <app-inline-edit [editable]="issue.permissions.edit"
+                [data]="{'issueKey':issue.key,'projectKey':issue.project.key,'field':'versions','value':issue.versions, 'values': issue.possibleVersions}"
+                (saveEvent)="saveEditable($event)" (changeEvent)="inlineItemChange($event)"></app-inline-edit>
+            </nz-spin>
+          </div>
+          <div class="card card-transparent" style="padding: 5px" *ngIf="issue.project.timeTracking.enabled">
+            <p class="hint-head m-b-0 small">Original Estimate</p>
+            <nz-spin [nzIndicator]="spinnerIndicatorTemplate" [nzSpinning]="fieldLoading.timeOriginalEstimate">
+              <app-inline-edit [editable]="issue.permissions.edit"
+                [data]="{'issueKey':issue.key,'projectKey':issue.project.key,'field':'timeOriginalEstimate','value':issue.estimateString}"
+                (saveEvent)="saveEditable($event)" (changeEvent)="inlineItemChange($event)"></app-inline-edit>
+            </nz-spin>
+          </div>
+          <div class="card card-transparent" style="padding: 5px" *ngIf="issue.project.timeTracking.enabled">
+            <h5 class="hint-head m-b-0 small">Time Tracking</h5>
+            <div (click)="createNewWorkLogDialog()" class="cursorpointer">
+              <h5 class="m-0 pb-1" style=" padding: 10px;" *ngIf="issue.timeSpentString !== ''"
+                [class.alreadyDue]="getWorkPercentage() > 100">
+                {{issue.timeSpentString}} logged
+              </h5>
+              <h5 class="m-0 pb-1" style="padding: 10px;" *ngIf="issue.timeSpentString === ''">no logs</h5>
+              <!-- <mat-progress-bar style="width: 60%;" class="mb-1" mode="determinate" value="{{getWorkPercentage()}}">
+              </mat-progress-bar> -->
+            </div>
+          </div>
+          <div class="card card-transparent" style="padding: 5px" *ngIf="issue.branchCount || issue.commitCount">
+            <p class="hint-head m-b-0 small">Development</p>
+            <span class="ml-2 cursorpointer mt-2" (click)="getBranches()">{{issue.branchCount}} branches</span>
+            <span class="ml-2 cursorpointer" (click)="getCommits()">{{issue.commitCount}} commits</span>
+          </div>
+          <div class="card card-transparent" style="padding: 5px">
+            <p class="hint-head m-b-0 small">Priority</p>
+            <nz-spin [nzIndicator]="spinnerIndicatorTemplate" [nzSpinning]="fieldLoading.priority">
+              <app-inline-edit [editable]="issue.permissions.edit"
+                [data]="{'issueKey':issue.key,'projectKey':issue.project.key,'field':'priority','value':issue.priority}"
+                (saveEvent)="saveEditable($event)" (changeEvent)="inlineItemChange($event)"></app-inline-edit>
+            </nz-spin>
+          </div>
+          <div class="card card-transparent" style="padding: 5px">
+            <p class="hint-head m-b-0 small">Start Date</p>
+            <nz-spin [nzIndicator]="spinnerIndicatorTemplate" [nzSpinning]="fieldLoading.StartDate">
+              <app-inline-edit [editable]="issue.permissions.edit"
+                [data]="{'issueKey':issue.key,'projectKey':issue.project.key,'field':'StartDate','value':issue.startDate}"
+                (saveEvent)="saveEditable($event)" (changeEvent)="inlineItemChange($event)"></app-inline-edit>
+            </nz-spin>
+          </div>
+          <div class="card card-transparent" style="padding: 5px">
+            <p class="hint-head m-b-0 small">End Date</p>
+            <nz-spin [nzIndicator]="spinnerIndicatorTemplate" [nzSpinning]="fieldLoading.EndDate">
+              <app-inline-edit [editable]="issue.permissions.edit"
+                [data]="{'issueKey':issue.key,'projectKey':issue.project.key,'field':'EndDate','value':issue.endDate}"
+                (saveEvent)="saveEditable($event)" (changeEvent)="inlineItemChange($event)"></app-inline-edit>
+            </nz-spin>
+          </div>
+          <div class="card card-transparent" style="padding: 5px">
+            <p class="hint-head m-b-0 small">Due Date</p>
+            <nz-spin [nzIndicator]="spinnerIndicatorTemplate" [nzSpinning]="fieldLoading.DueDate">
+              <app-inline-edit [editable]="issue.permissions.edit"
+                [data]="{'issueKey':issue.key,'projectKey':issue.project.key,'field':'DueDate','value':issue.dueDate}"
+                (saveEvent)="saveEditable($event)" (changeEvent)="inlineItemChange($event)"></app-inline-edit>
+            </nz-spin>
+          </div>
+          <div class="card card-transparent" style="padding: 5px">
+            <p class="hint-head m-b-0 small">Labels</p>
+            <nz-spin [nzIndicator]="spinnerIndicatorTemplate" [nzSpinning]="fieldLoading.label">
+              <app-inline-edit [editable]="issue.permissions.edit"
+                [data]="{'issueKey':issue.key,'projectKey':issue.project.key,'field':'label','value':issue.labels}"
+                (saveEvent)="saveEditable($event)" (changeEvent)="inlineItemChange($event)"></app-inline-edit>
+            </nz-spin>
+          </div>
+          <div class="card card-transparent" style="padding: 5px"
+            *ngIf="issue.possibleComponents && issue.possibleComponents.length > 0">
+            <p class="hint-head m-b-0 small">Component</p>
+            <nz-spin [nzIndicator]="spinnerIndicatorTemplate" [nzSpinning]="fieldLoading.component">
+              <app-inline-edit [editable]="issue.permissions.edit"
+                [data]="{'issueKey':issue.key,'projectKey':issue.project.key,'field':'component','value':issue.components, 'values': issue.possibleComponents}"
+                (saveEvent)="saveEditable($event)" (changeEvent)="inlineItemChange($event)"></app-inline-edit>
+            </nz-spin>
+          </div>
+          <p class="hint-text m-t-20 m-b-0 small" nz-tooltip nzTooltipPlacement="left"
+            nzTooltipTitle="{{issue.created | date:'long'}}">Created
+            {{issue.created | date:'medium'}}</p>
+          <p class="hint-text m-t-10 m-b-0 small" *ngIf="issue.updated" nz-tooltip nzTooltipPlacement="left"
+            nzTooltipTitle="{{issue.updated | date:'long'}}">Updated {{issue.updated| timeAgo}}</p>
+        </div>
+      </div>
+    </div>
+    <div class="card pl-3 pr-3 pb-2 m-10" *ngIf="issueLoading && !issueError">
+      <div class="row p-5" style="height: 300px;">
+        <nz-skeleton [nzLoading]="issueLoading" [nzActive]="true"></nz-skeleton>
+      </div>
+    </div>
+    <div *ngIf="issueError" class="d-flex justify-content-center mt-5">
+      <nz-empty nzNotFoundImage="/assets/img/not_found.svg" class="issue_empty"
+        nzNotFoundContent="Issue doesn`t exist, Either deleted or you do not have permissions"></nz-empty>
+    </div>
+  </div>
+</div>
+<nz-modal [nzWidth]="previewImageInnerWidth" [(nzVisible)]="previewImageSrc" nzTitle=""
+  (nzOnCancel)="previewImageSrc = undefined" class="text-center">
+  <div *ngIf="showPreviewImageLoading" class="loading"></div>
+  <img src="{{previewImageSrc}}" [style.max-height.px]="[previewImageInnerHeight]" class="mt-4"
+    [style.max-width.px]="[previewImageInnerWidth] - 50" (load)="showPreviewImageLoading = false" />
+  <div *nzModalFooter> </div>
+</nz-modal>
+<nz-modal [(nzVisible)]="showBranchModal" nzTitle="Branches" nzWidth="60vw" (nzOnCancel)="showBranchModal = false"
+  nzClassName="modal-no-footer">
+  <nz-table class="issueTable" *ngIf="branches" #branchesTable [nzData]="branches" nzPageSize="999999"
+    [nzNoResult]="createDocTemp" nzShowPagination="false">
+    <thead>
+      <tr>
+        <th>Repository</th>
+        <th>Name</th>
+        <th>Create pull/merge request</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of branchesTable.data">
+        <td>{{r.repoName}}</td>
+        <td class="v-align-middle semi-bold">
+          {{r.name}}
+        </td>
+        <td>
+          <a *ngIf="r.url" target="blank" href="{{r.url}}">
+            <app-icon height="20" width="20" icon="box-arrow-up-right"></app-icon>
+          </a>
+        </td>
+      </tr>
+    </tbody>
+    <ng-template #createDocTemp>
+      <img src="/assets/img/empty.svg" class="jdempty" width="200">
+    </ng-template>
+  </nz-table>
+  <div *nzModalFooter></div>
+</nz-modal>
+<nz-modal [(nzVisible)]="showCommitsModal" nzTitle="Commits" nzWidth="60vw" (nzOnCancel)="showCommitsModal = false"
+  nzClassName="modal-no-footer">
+  <nz-table class="issueTable" *ngIf="commits" #commitsTable [nzData]="commits" nzPageSize="999999"
+    [nzNoResult]="createDocTemp" nzShowPagination="false">
+    <thead>
+      <tr>
+        <th>Repository</th>
+        <th>Message</th>
+        <th>Changes</th>
+        <th>Author</th>
+        <th>Link</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of commitsTable.data">
+        <td>{{r.repoName}}</td>
+        <td class="v-align-middle semi-bold">
+          {{r.name}}
+        </td>
+        <td class="v-align-middle semi-bold" nz-tooltip
+          nzTooltipTitle="{{r.added}} added, {{r.modified}} changed, {{r.removed}} removed files">
+          <span class="text-success">{{r.added}}</span>&nbsp;
+          <span class="text-warning">{{r.modified}}</span>&nbsp;
+          <span class="text-danger">{{r.removed}}</span>
+        </td>
+        <td class="v-align-middle semi-bold">
+          {{r.author}}
+        </td>
+        <td>
+          <a *ngIf="r.url" target="blank" href="{{r.url}}">
+            <app-icon height="20" width="20" icon="box-arrow-up-right"></app-icon>
+          </a>
+        </td>
+      </tr>
+    </tbody>
+    <ng-template #createDocTemp>
+      <img src="/assets/img/empty.svg" class="jdempty" width="200">
+    </ng-template>
+  </nz-table>
+  <div *nzModalFooter></div>
+</nz-modal>
+<nz-modal [(nzVisible)]="showAddwebLink" nzTitle="Add web link" nzWidth="30vw" (nzOnCancel)="showAddwebLink = false"
+  nzClassName="modal-no-footer">
+  <form nz-form (ngSubmit)="addWebLink()" #vForm="ngForm" ngNativeValidate nzLayout="horizontal">
+    <nz-form-item class="mb-1">
+      <nz-form-label>Label</nz-form-label>
+      <nz-form-control nzHasFeedback nzErrorTip="Label is required">
+        <input nz-input [(ngModel)]="webLink.label" name="labelName" required />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item class="mb-1">
+      <nz-form-label>URL</nz-form-label>
+      <nz-form-control nzHasFeedback nzErrorTip="URL is required">
+        <input nz-input type="url" [(ngModel)]="webLink.link" name="urlName" required />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item class="mb-1">
+      <nz-form-control class="pull-right">
+        <button nz-button nzType="primary">Add</button>
+        <button nz-button nzType="default" (click)="showAddwebLink = false">Cancel</button>
+      </nz-form-control>
+    </nz-form-item>
+  </form>
+  <div *nzModalFooter></div>
+</nz-modal>
+<ng-template #updatedNotificationTemplate>
+  Issue has been updated. <a nz-button nzType="link" (click)="getwithLoading()">Reload</a>
+</ng-template>
+<ng-template #spinnerIndicatorTemplate><i nz-icon nzType="loading" style="font-size: 24px;"></i> </ng-template>

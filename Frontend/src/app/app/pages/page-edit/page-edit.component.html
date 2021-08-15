@@ -1,0 +1,42 @@
+<nz-layout *ngIf="wiki" class="wiki-area wikiLayout" (drop)="dropHandler($event)" (dragover)="dragOverHandler($event)"
+  (dragend)="onDragEnd($event)">
+  <nz-content>
+    <nz-page-header class="wikiHeader">
+      <nz-page-header-title *ngIf="wiki.parent">
+        <nz-breadcrumb nzSeparator="/">
+          <nz-breadcrumb-item *ngFor="let b of breadcrumb">
+            <a routerLink="/project/{{projectKey}}/wiki/folder/{{b.id}}">{{b.title}}</a>
+          </nz-breadcrumb-item>
+        </nz-breadcrumb>
+      </nz-page-header-title>
+      <nz-page-header-subtitle *ngIf="!wiki.parent">ROOT</nz-page-header-subtitle>
+      <nz-page-header-tags>
+        <nz-tag nzColor="lime" *ngIf="wiki.parent" (click)="clearParent()" nz-tooltip nzTooltipPlacement="topLeft"
+          nzTooltipTitle="Create page at root level">Clear Parent</nz-tag>
+      </nz-page-header-tags>
+      <nz-page-header-extra *ngIf="wiki.editable">
+        <button *ngIf="!wiki.id" (click)="save(mrkContent.value)" [nzLoading]="loading" class="wikiUpdateBtn" nz-button
+          nzType="primary">Create</button>
+        <button *ngIf="wiki.id" (click)="save(mrkContent.value)" [nzLoading]="loading" class="wikiUpdateBtn" nz-button
+          nzType="primary">Update</button>
+        <button (click)="cancel()" [disabled]="loading" nz-button nzType="default">Cancel</button>
+        <nz-divider nzType="vertical"></nz-divider>
+        <button *ngIf="wiki.id && !wiki.projectDefault && wiki.deleteable" [disabled]="loading" (click)="delete()"
+          class="wikiEditBtn" nz-button nzType="primary">
+          <app-icon height="18" width="18" icon="trash"> </app-icon>
+        </button>
+      </nz-page-header-extra>
+    </nz-page-header>
+    <p class="wikiTitle p-2 mt-4 m-3" #wikiTitle contenteditable="true" placeholder="Page title">{{wiki.title}}</p>
+    <div id="edit-editormd">
+      <textarea #mrkContent style="display:none;" [value]="wiki.content"></textarea>
+    </div>
+    <input type="file" id="attachmentInpt" name="descAttachment" #fileInput (change)="attachFile($event)"
+      class="hide" />
+  </nz-content>
+</nz-layout>
+<nz-layout *ngIf="wiki && !wiki.editable" class="wiki-area wikiLayout">
+  <nz-empty nzNotFoundContent="Content not editable">
+  </nz-empty>
+</nz-layout>
+<nz-skeleton [nzActive]="true" [nzLoading]="loading"></nz-skeleton>

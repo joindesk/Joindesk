@@ -1,0 +1,283 @@
+<!--Summary Start-->
+<div *ngIf="data.field === 'summary'">
+  <div class="contentWrapper">
+    <h3 contenteditable="true" #ctrl class="summary editable mb-0" [class.pencil]="pencil"
+      [class.summaryHighlight]="edit" (mouseenter)="editable && !edit ? pencil = true: pencil = false"
+      (mouseleave)="pencil = false" (click)="enableEdit()">{{data.value}}
+    </h3>
+    <div *ngIf="edit" class="buttonsWrapper">
+      <button nz-button nzType="primary" class="fCheckBtn" (mousedown)="saveSummary(ctrl.innerText);"
+        nzSize="default"><i nz-icon nzType="check"></i></button>
+      <button nz-button nzType="default" class="fCrossBtn" (click)="cancelCtrlEdit();" nzSize="default"><i nz-icon
+          nzType="close"></i></button>
+    </div>
+  </div>
+</div>
+<!--Summary End-->
+<!--Priority Start-->
+<div *ngIf="data.field === 'priority'">
+  <div class="editable" nz-dropdown nzBackdrop="false" [nzDropdownMenu]="priorityMenu" [nzDisabled]="editable == false"
+    nzTrigger="click" [class.pencil]="pencil" [title]="editable ? 'Click to Edit': ''"
+    (mouseenter)="editable ? pencil = true: pencil = false" (mouseleave)="pencil = false">
+    <img *ngIf="data.value === 'Urgent'" src="/assets/img/priority-blocker.svg" alt="" height="16" />
+    <img *ngIf="data.value === 'High'" src="/assets/img/priority-high.svg" alt="" height="16" />
+    <img *ngIf="data.value === 'Normal'" src="/assets/img/priority-normal.svg" alt="" height="16" />
+    <img *ngIf="data.value === 'Low'" src="/assets/img/priority-low.svg" alt="" height="16" />
+    <span class="ml-2"> {{data.value}}</span>
+  </div>
+  <nz-dropdown-menu #priorityMenu="nzDropdownMenu">
+    <ul nz-menu nzSelectable>
+      <li nz-menu-item [nzDisabled]="'Urgent' == data.value" (click)="savePriority('Urgent')"><img
+          src="/assets/img/priority-blocker.svg" />
+        Urgent</li>
+      <li nz-menu-item [nzDisabled]="'High' == data.value" (click)="savePriority('High')"><img
+          src="/assets/img/priority-high.svg" /> High
+      </li>
+      <li nz-menu-item [nzDisabled]="'Normal' == data.value" (click)="savePriority('Normal')"><img
+          src="/assets/img/priority-normal.svg" />
+        Normal</li>
+      <li nz-menu-item [nzDisabled]="'Low' == data.value" (click)="savePriority('Low')"><img
+          src="/assets/img/priority-low.svg" /> Low</li>
+    </ul>
+  </nz-dropdown-menu>
+</div>
+<div *ngIf="false && data.field === 'priority'">
+  <div *ngIf="!edit" class="editable" [class.pencil]="pencil" (mouseenter)="editable ? pencil = true: pencil = false"
+    (mouseleave)="pencil = false" (click)="enableEdit()">
+    <img *ngIf="data.value === 'Urgent'" src="/assets/img/priority-blocker.svg" alt="" height="16" />
+    <img *ngIf="data.value === 'High'" src="/assets/img/priority-high.svg" alt="" height="16" />
+    <img *ngIf="data.value === 'Normal'" src="/assets/img/priority-normal.svg" alt="" height="16" />
+    <img *ngIf="data.value === 'Low'" src="/assets/img/priority-low.svg" alt="" height="16" />
+    <span class="ml-2">{{data.value}}</span>
+  </div>
+  <div *ngIf="edit" class="contentWrapper editable">
+    <nz-select name="priority" required [(ngModel)]="currentVal" nzPlaceHolder="Choose" nzAllowClear="false"
+      (ngModelChange)="savePriority(true)" [nzSize]="large" (nzBlur)="savePriority(false)">
+      <nz-option nzCustomContent nzValue="Urgent" nzLabel="Urgent">
+        <img src="/assets/img/priority-blocker.svg" /> Urgent
+      </nz-option>
+      <nz-option nzCustomContent nzValue="High" nzLabel="High"> <img src="/assets/img/priority-high.svg" />
+        High</nz-option>
+      <nz-option nzCustomContent nzValue="Normal" nzLabel="Normal"><img src="/assets/img/priority-normal.svg" />
+        Normal</nz-option>
+      <nz-option nzCustomContent nzValue="Low" nzLabel="Low"><img src="/assets/img/priority-low.svg" /> Low
+      </nz-option>
+    </nz-select>
+  </div>
+</div>
+<!--Priority End-->
+<!--IssueType Start-->
+<div *ngIf="data.field === 'IssueType'">
+  <button *ngIf="!edit" (click)="enableEdit()" nz-button nzType="dashed"><i
+      class="issueType fa fa-{{data.value.iconUrl}}"></i>
+    {{data.value.name}}</button>
+  <div *ngIf="edit" class="contentWrapper editable">
+    <form (ngSubmit)="saveIssueType(v.value)" #IssueTypeForm="ngForm" ngNativeValidate>
+      <select name="ReporterForm" #v required="true" class="form-control">
+        <option *ngFor="let a of issueTypeService.issueTypes" [selected]="data.value.id == a.id" value="{{a.id}}">
+          {{a.name}}</option>
+      </select>
+      <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+    </form>
+  </div>
+</div>
+<!--IssueType End-->
+<!--Reporter Start-->
+<div *ngIf="data.field === 'reporter'" class="editable">
+  <div class="d-flex align-items-center" nz-dropdown nzBackdrop="false" [nzDropdownMenu]="reporterMenu"
+    [nzDisabled]="editable == false" nzTrigger="click" [class.pencil]="pencil" [title]="editable ? 'Click to Edit': ''"
+    [(nzVisible)]="showDropdown" nzClickHide="false" (mouseenter)="editable ? pencil = true: pencil = false"
+    (mouseleave)="pencil = false">
+    <app-usermedia *ngIf="data.value" [user]="data.value" [tooltip]="data.value.fullName" [s]="'d32'"
+      [pic]="data.value.pic">
+    </app-usermedia>
+    <div class="pl-2">
+      <span class="text-master mt-1"> {{data.value.fullName}}</span>
+    </div>
+  </div>
+  <nz-dropdown-menu #reporterMenu="nzDropdownMenu">
+    <ul nz-menu nzSelectable style="max-height: 50vh; overflow-y:scroll">
+      <li nz-menu-item>
+        <input nz-input placeholder="Search" #rSearch />
+      </li>
+      <li nz-menu-item *ngFor="let option of assignableMembers | jdUserfilter:rSearch.value"
+        [nzDisabled]="option.id == data.value.id" (click)="saveReporter(option.id)">{{option.fullName}}</li>
+    </ul>
+  </nz-dropdown-menu>
+</div>
+<!--Reporter End-->
+<!--Assignee Start-->
+<div *ngIf="data.field === 'assignee'" class="editable">
+  <div class="d-flex align-items-center" nz-dropdown nzBackdrop="false" [nzDropdownMenu]="assigneeMenu"
+    [title]="editable ? 'Click to Edit': ''" [(nzVisible)]="showDropdown" nzClickHide="false"
+    [nzDisabled]="editable == false" nzTrigger="click" [class.pencil]="pencil"
+    (mouseenter)="editable ? pencil = true: pencil = false" (mouseleave)="pencil = false">
+    <app-usermedia [tooltip]="data.value.fullName" *ngIf="data.value" [user]="data.value" [s]="'d32'"
+      [pic]="data.value.pic">
+    </app-usermedia>
+    <app-usermedia [tooltip]="'?'" *ngIf="!data.value" [s]="'d32'" [pic]="'unassigned'"></app-usermedia>
+    <div class="pl-2">
+      <span class="text-master mt-1"> {{data.value ? data.value.fullName : 'unassigned'}}</span>
+    </div>
+  </div>
+  <nz-dropdown-menu #assigneeMenu="nzDropdownMenu">
+    <ul nz-menu nzSelectable style="max-height: 50vh; overflow-y:scroll">
+      <li nz-menu-item *ngIf="(data.value && currentUserID != data.value.id) || !data.value" (click)="assignToMe()">
+        Assign to Myself</li>
+      <li nz-menu-item *ngIf="data.value" (click)="saveAssignee(null)">Remove Assignee</li>
+      <li nz-menu-divider *ngIf="data.value || showAssignToSelf"></li>
+      <li nz-menu-item>
+        <input nz-input placeholder="Search" #aSearch />
+      </li>
+      <li nz-menu-item *ngFor="let option of assignableMembers | jdUserfilter:aSearch.value"
+        [nzDisabled]="data.value ? option.id == data.value.id : false" (click)="saveAssignee(option)">
+        {{option.fullName}}</li>
+    </ul>
+  </nz-dropdown-menu>
+</div>
+<!--Assignee End-->
+<!--DueDate Start-->
+<div *ngIf="data.field === 'DueDate'">
+  <h5 *ngIf="!edit" class="editable m-0" [class.alreadyDue]="isDue(data.value)" [class.pencil]="pencil"
+    (mouseenter)="editable ? pencil = true: pencil = false" (mouseleave)="pencil = false" (click)="enableEdit()">
+    {{data.value | date}}
+  </h5>
+  <div *ngIf="edit" class="contentWrapper editable issueDatePicker">
+    <form (ngSubmit)="saveDueDate()" #DueDateForm="ngForm" ngNativeValidate>
+      <nz-date-picker name="startDate" [(ngModel)]="data.value"></nz-date-picker>
+      <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+    </form>
+  </div>
+</div>
+<!--DueDate End-->
+<!--StartDate Start-->
+<div *ngIf="data.field === 'StartDate'">
+  <h5 *ngIf="!edit" class="editable m-0" [class.pencil]="pencil" (mouseenter)="editable ? pencil = true: pencil = false"
+    (mouseleave)="pencil = false" (click)="enableEdit()">
+    {{data.value | date}}
+  </h5>
+  <div *ngIf="edit" class="contentWrapper editable issueDatePicker">
+    <form (ngSubmit)="saveStartDate()" #StartDateForm="ngForm" ngNativeValidate>
+      <nz-date-picker name="startDate" [(ngModel)]="data.value"></nz-date-picker>
+      <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+    </form>
+  </div>
+</div>
+<!--StartDate End-->
+<!--EndDate Start-->
+<div *ngIf="data.field === 'EndDate'">
+  <h5 *ngIf="!edit" class="editable m-0" [class.pencil]="pencil" (mouseenter)="editable ? pencil = true: pencil = false"
+    (mouseleave)="pencil = false" (click)="enableEdit()">
+    {{data.value | date}}
+  </h5>
+  <div *ngIf="edit" class="contentWrapper editable issueDatePicker">
+    <form (ngSubmit)="saveEndDate()" #EndDateForm="ngForm" ngNativeValidate>
+      <nz-date-picker name="endDate" [(ngModel)]="data.value"></nz-date-picker>
+      <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+    </form>
+  </div>
+</div>
+<!--EndDate End-->
+<!--OriginalEstimate Start-->
+<div *ngIf="data.field === 'timeOriginalEstimate'">
+  <h5 *ngIf="!edit" class="editable m-0" [class.pencil]="pencil" (mouseenter)="editable ? pencil = true: pencil = false"
+    (mouseleave)="pencil = false" (click)="enableEdit()" title="Estimate">
+    <span *ngIf="data.value !== ''">{{data.value}}</span>
+    <span *ngIf="data.value === ''">0m</span>
+  </h5>
+  <div *ngIf="edit" class="contentWrapper editable">
+    <form (ngSubmit)="saveOriginalEstimate(v.value)" #OriginalEstimateForm="ngForm" ngNativeValidate>
+      <input placeholder="Ex: 1w 3d 5h 10m" type="text" class="form-control" value="{{data.value}}" #v required="true">
+      <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+    </form>
+  </div>
+</div>
+<!--OriginalEstimate End-->
+<!--Component Start-->
+<div *ngIf="data.field === 'component'">
+  <div *ngIf="!edit" class="editable" [class.pencil]="pencil" (mouseenter)="editable ? pencil = true: pencil = false"
+    (mouseleave)="pencil = false" (click)="enableEdit()">
+    <div class="d-flex align-items-center">
+      <span class="text-master mt-1">
+        <span class="labelBtn" *ngFor="let a of data.value"
+          (click)="searchByComponent(a.id);$event.stopPropagation()">{{a.name}}</span>
+        <h5 *ngIf="data.value.length <= 0" class="noneHolder">None</h5>
+      </span>
+    </div>
+  </div>
+  <div *ngIf="edit" class="contentWrapper editable">
+    <form (ngSubmit)="saveComponents()" #ComponentsForm="ngForm">
+      <nz-select name="comp" nzMode="multiple" nzPlaceHolder="Components" [(ngModel)]="currentVal"
+        [compareWith]="compareFn">
+        <nz-option *ngFor="let option of data.values" [nzLabel]="option.name" [nzValue]="option"></nz-option>
+      </nz-select>
+      <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+    </form>
+  </div>
+</div>
+<!--Component End-->
+<!--Version Start-->
+<div *ngIf="data.field === 'versions'">
+  <div *ngIf="!edit" class="editable" [class.pencil]="pencil" (mouseenter)="editable ? pencil = true: pencil = false"
+    (mouseleave)="pencil = false" (click)="enableEdit()">
+    <div class="d-flex align-items-center">
+      <span class="text-master mt-1">
+        <span class="labelBtn" *ngFor="let a of data.value"
+          (click)="searchByVersion(a.id);$event.stopPropagation()">{{a.name}}</span>
+        <h5 *ngIf="data.value.length <= 0" class="noneHolder">None</h5>
+      </span>
+    </div>
+  </div>
+  <div *ngIf="edit" class="contentWrapper editable">
+    <!-- <form (ngSubmit)="saveVersion(v.value)" #VersionForm="ngForm" ngNativeValidate>
+      <mat-select #v placeholder="Choose versions" [(value)]="data.value" multiple [compareWith]="compareFn">
+        <mat-option *ngFor="let a of data.values" [value]="a">{{a.name}}</mat-option>
+      </mat-select>
+      <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+    </form> -->
+    <form (ngSubmit)="saveVersion()" #ComponentsForm="ngForm">
+      <nz-select name="comp" nzMode="multiple" nzPlaceHolder="Choose Versions" [(ngModel)]="currentVal"
+        [compareWith]="compareFn">
+        <nz-option-group nzLabel="Unreleased" *ngIf="versions.unreleased.length > 0">
+          <nz-option *ngFor="let option of versions.unreleased" [nzLabel]="option.name" [nzValue]="option"></nz-option>
+        </nz-option-group>
+        <nz-option-group nzLabel="Released" *ngIf="versions.released.length > 0">
+          <nz-option *ngFor="let option of versions.released" [nzLabel]="option.name" [nzValue]="option"></nz-option>
+        </nz-option-group>
+      </nz-select>
+      <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+    </form>
+  </div>
+</div>
+<!--Version End-->
+<!--Label Start-->
+<div *ngIf="data.field === 'label'">
+  <div *ngIf="!edit" class="editable" [class.pencil]="pencil" (mouseenter)="editable ? pencil = true: pencil = false"
+    (mouseleave)="pencil = false" (click)="enableEdit()">
+    <div class="d-flex align-items-center">
+      <span class="text-master mt-1">
+        <span class="labelBtn" *ngFor="let a of data.value"
+          (click)="searchByLabel(a.id);$event.stopPropagation()">{{a.name}}</span>
+        <h5 *ngIf="data.value.length <= 0" class="noneHolder">None</h5>
+      </span>
+    </div>
+  </div>
+  <div *ngIf="edit" class="contentWrapper editable">
+    <form (ngSubmit)="saveLabels()" #LabelsForm="ngForm">
+      <nz-select name="comp" nzMode="tags" nzPlaceHolder="Labels" [(ngModel)]="currentVal" [compareWith]="compareFn"
+        (ngModelChange)="labelChange()">
+        <nz-option *ngFor="let option of labels" [nzLabel]="option.name" [nzValue]="option"></nz-option>
+      </nz-select>
+      <ng-container [ngTemplateOutlet]="formButtons"></ng-container>
+    </form>
+  </div>
+</div>
+<!--Label End-->
+<ng-template #formButtons>
+  <div *ngIf="edit" class="buttonsWrapper">
+    <button nz-button nzType="primary" class="fCheckBtn" type="submit" nzSize="default"><i nz-icon
+        nzType="check"></i></button>
+    <button nz-button nzType="default" class="fCrossBtn" (click)="cancelEdit();$event.stopPropagation();"
+      nzSize="default"><i nz-icon nzType="close"></i></button>
+  </div>
+</ng-template>

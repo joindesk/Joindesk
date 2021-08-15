@@ -1,0 +1,175 @@
+<nz-page-header [nzGhost]="false">
+    <nz-page-header-title>Users</nz-page-header-title>
+    <nz-page-header-extra>
+        <button nz-button (click)="create()" nzType="primary">Create</button>
+        <button nz-button nzType="default" *ngIf="slackEnabled" (click)="getCandidates()">Import from Slack</button>
+        <button nz-button nzType="default" (click)="getPendingUsers()">For review</button>
+    </nz-page-header-extra>
+</nz-page-header>
+<div class="m-0 mt-4 row">
+    <div class="col-12">
+        <nz-table #userTable [nzData]="userService.users" nzPageSize="999999" [nzNoResult]="createDocTemp"
+            nzShowPagination="false">
+            <thead>
+                <tr role="row">
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Created</th>
+                    <th class="text-center">Status</th>
+                    <th style="width:20%"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr role="row" *ngFor="let user of userTable.data">
+                    <td class="v-align-middle semi-bold">
+                        <a (click)="userService.getUser(user.id)">{{user.fullName}}</a>
+                    </td>
+                    <td class="v-align-middle semi-bold">
+                        {{user.email}}
+                    </td>
+                    <td class="v-align-middle semi-bold">
+                        {{user.createdAt | date}}
+                    </td>
+                    <td class="v-align-middle text-center">
+                        <app-icon class="pr-1" height="20" width="20"
+                            icon="{{user.active ? 'check2-circle': 'dash-circle'}}" nz-tooltip
+                            nzTooltipTitle="{{user.active ? 'Active': 'Inactive'}}"> </app-icon>
+                        <!-- <app-icon class="pr-1" height="20" width="20" icon="{{user.mfaEnabled ? 'shield-check': 'shield-slash'}}" nz-tooltip nzTooltipTitle="{{user.mfaEnabled ? '2FA Enabled': '2FA Disabled'}}">
+                        </app-icon> -->
+                        <app-icon class="pr-1" height="20" width="20" icon="{{user.superAdmin ? 'star': ''}}" nz-tooltip
+                            nzTooltipTitle="Admin">
+                        </app-icon>
+                        <app-icon class="pr-1" height="20" width="20" icon="{{user.locked ? 'lock': ''}}" nz-tooltip
+                            nzTooltipTitle="Locked">
+                        </app-icon>
+                    </td>
+                    <td>
+                        <a (click)="userService.getUser(user.id)" class="btn btn-default btn-xs pull-right">
+                            <app-icon height="18" width="18" icon="arrow-right-short"> </app-icon>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+            <ng-template #createDocTemp>
+                <img src="/assets/img/empty.svg" class="jdempty" width="200">
+            </ng-template>
+        </nz-table>
+    </div>
+</div>
+<nz-drawer [nzClosable]="true" nzWidth="60vw" [nzVisible]="user != undefined" nzPlacement="right"
+    (nzOnClose)="cancel()">
+    <div *ngIf="user">
+        <div class="card-title" style="text-transform:none">
+            <h3>
+                <span *ngIf="!user.id">Create </span>{{user.fullName}}
+            </h3>
+        </div>
+        <div class="row" *ngIf="!user.edit">
+            <div class="col-4">
+                Name:
+            </div>
+            <div class="col-4">
+                {{user.fullName}}
+            </div>
+            <div class="col-4">
+                <app-usermedia [s]="'d32'" [tooltip]="user.fullName" [user]="user" [pic]="user.pic"></app-usermedia>
+            </div>
+        </div>
+        <div class="row" *ngIf="!user.edit">
+            <div class="col-4">
+                Email:
+                <br /> Active:
+                <br /> Locked:
+                <br /> Api:
+            </div>
+            <div class="col-4">
+                {{user.email}}
+                <br />{{user.active ? 'True': 'False'}}
+                <br />{{user.locked ? 'True': 'False'}}
+                <br />{{user.apiEnabled ? 'True': 'False'}}
+            </div>
+        </div>
+        <div class="row" *ngIf="!user.edit && user.apiEnabled">
+            <div class="col-12" *ngIf="user.apiToken">
+                <div class="input-group">
+                    <input type="text" class="form-control" value="{{user.apiToken}}" readonly>
+                    <div class="input-group-append">
+                        <span class="btn btn-default" (click)="resetApiToken()">Reset Token</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngIf="!user.apiToken">
+                <span class="btn btn-default" (click)="getApiToken()">Show Token</span>
+            </div>
+        </div>
+        <button class="btn btn-primary m-t-10" *ngIf="!user.edit" (click)="user.edit=true">Edit</button>
+        <form (ngSubmit)="save()" #userForm="ngForm" ngNativeValidate *ngIf="user.edit">
+            <div class="form-group">
+                <label for="exampleInputPassword1">Name</label>
+                <input type="text" class="form-control" autocomplete="false" minlength="4" required name="fullName"
+                    placeholder="Name" [(ngModel)]="user.fullName">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-control" autocomplete="false" required name="email"
+                    [(ngModel)]="user.email" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-control" autocomplete="false" name="password"
+                    [(ngModel)]="user.password" placeholder="***********" minlength="8" [required]="!user.id">
+                <span class="help-text" *ngIf="user.id">Fill only if change is required</span>
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" name="activeCheck" id="activeCheck"
+                    [(ngModel)]="user.active">
+                <label class="form-check-label" for="activeCheck">Active ?</label>
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" name="apiEnabledCheck" id="apiEnabledCheck"
+                    [(ngModel)]="user.apiEnabled">
+                <label class="form-check-label" for="apiEnabledCheck">Api Enabled ?</label>
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" name="lockedCheck" id="lockedCheck"
+                    [(ngModel)]="user.locked">
+                <label class="form-check-label" for="lockedCheck">Lock</label>
+            </div>
+            <div class="form-group" *ngIf="user.locked">
+                <label for="lockReason">Lock Reason</label>
+                <input type="text" class="form-control" required name="lockReason" placeholder="reason for lock"
+                    [(ngModel)]="user.lockReason">
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" name="superAdminCheck" [(ngModel)]="user.superAdmin">
+                <label class="form-check-label" for="superAdminCheck">Super Admin ?</label>
+            </div>
+            <div class="drawer-footer">
+                <button type="submit" nz-button nzType="primary" *ngIf="!user.id">Create</button>
+                <button type="submit" nz-button nzType="primary" *ngIf="user.id">Update</button>
+                <button type="button" (click)="cancelEdit()" nz-button nzType="default">Cancel</button>
+            </div>
+        </form>
+    </div>
+</nz-drawer>
+<nz-drawer [nzClosable]="true" nzWidth="60vw" [nzVisible]="showImport" nzPlacement="right"
+    (nzOnClose)="showImport = false">
+
+    <ul class="list-group">
+        <li class="list-group-item" *ngFor="let sc of slackCandidates">{{sc.name}}
+            <button class="btn btn-primary pull-right" (click)="importSlackUser(sc.id)">Import</button>
+        </li>
+        <nz-empty *ngIf="slackCandidates && slackCandidates.length === 0" nzNotFoundContent="No importable data">
+        </nz-empty>
+    </ul>
+</nz-drawer>
+<nz-drawer [nzClosable]="true" nzWidth="60vw" [nzVisible]="showPending" nzPlacement="right"
+    (nzOnClose)="showPending = false">
+    <ul class="list-group">
+        <li class="list-group-item" *ngFor="let sc of pendingUsers">{{sc.fullName}} [{{sc.email}}]
+            <button class="btn btn-primary pull-right" (click)="approvePendingUser(sc)">Approve</button>
+            <button class="btn btn-danger pull-right" (click)="rejectPendingUser(sc)">Reject</button>
+        </li>
+        <nz-empty *ngIf="pendingUsers && pendingUsers.length === 0" nzNotFoundContent="Nothing to review"></nz-empty>
+    </ul>
+</nz-drawer>

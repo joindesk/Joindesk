@@ -1,0 +1,54 @@
+<div class="card card-bordered" *ngIf="workflow">
+  <div class="card-header">
+    <div class="card-title">
+      {{workflow.name}}
+    </div>
+    <button routerLink="../" class="pull-right p-0" nz-button nzType="default">
+      <app-icon height="20" width="20" icon="x"></app-icon>
+    </button>
+    <button routerLink="../edit/{{workflow.id}}" class="pull-right p-0 mr-2" nz-button nzType="default">
+      <app-icon height="20" width="20" icon="pencil-square"></app-icon>
+    </button>
+  </div>
+  <div class="card-body">
+    <p>{{workflow.description}}</p>
+    <p>
+      <b>Default Step: </b>
+      <span
+        class="issueStatus issueStatus-{{workflow.defaultStep.issueStatus.issueLifeCycle}}">{{workflow.defaultStep.issueStatus.name}}</span>
+    </p>
+    <app-workflow-preview [w]="workflow"></app-workflow-preview>
+    <div class="row">
+      <table class="table table-hover dataTable no-footer">
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>LifeCycle</th>
+            <th>Transitions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let wst of workflow.workflowStepTransitions">
+            <td class="align-middle">
+              <span
+                class="issueStatus issueStatus-{{wst.step.issueStatus.issueLifeCycle}}">{{wst.step.issueStatus.name}}</span>
+            </td>
+            <td class=" align-middle">
+              {{wst.step.issueStatus.issueLifeCycle}}
+            </td>
+            <td class="align-middle p-1">
+              <ul class="list-group">
+                <li class="list-group-item p-1" *ngFor="let wt of wst.workflowTransitions">{{wt.name}}
+                  <p class="m-0">
+                    <app-icon height="18" width="18" icon="chevron-double-right"></app-icon>
+                    {{wt.toStep.issueStatus.name}}
+                  </p>
+                </li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

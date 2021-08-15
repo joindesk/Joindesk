@@ -1,0 +1,74 @@
+<nz-page-header [nzGhost]="false" class="issueHeader">
+  <nz-page-header-title class="issueTitle" *ngIf="getCurrentBoard()">
+    <a class="greyA mr-2" (click)="back()"><i nz-icon nzType="arrow-left" nzTheme="outline"></i></a>
+    {{board.name}} <span *ngIf="!board.active">(InActive)</span>
+  </nz-page-header-title>
+  <nz-page-header-title class="issueTitle" *ngIf="!getCurrentBoard()">
+    Boards
+  </nz-page-header-title>
+  <nz-page-header-extra class="issueTitleExtra">
+    <button nz-button nzType="dashed" *ngIf="!board" (click)="create(boardModalContent)"><i nz-icon nzType="plus"
+        nzTheme="outline"></i>
+      New</button>
+    <button nz-button nzType="dashed" *ngIf="board" (click)="editBoard(boardModalContent)"><i nz-icon nzType="edit"
+        nzTheme="outline"></i>
+      Edit</button>
+  </nz-page-header-extra>
+</nz-page-header>
+<nz-card style="background: none;box-shadow: none !important;">
+  <router-outlet></router-outlet>
+  <div class="m-t-30" *ngIf="route.children.length == 0">
+    <nz-skeleton [nzLoading]="!boards" [nzActive]="true" [nzParagraph]="{ rows: 4 }"></nz-skeleton>
+    <nz-table class="boardsTable" nzShowPagination="false" *ngIf="boards" #BoardsTable [nzData]="boards"
+      nzPageSize="999999">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Active</th>
+          <th>Filter</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let i of BoardsTable.data">
+          <td>
+            <a routerLink="{{i.id}}">{{i.name}}</a>
+          </td>
+          <td>
+            <i nz-icon nzType="check-circle" *ngIf="i.active" nzTheme="outline"></i>
+            <i nz-icon nzType="close-circle" *ngIf="!i.active" nzTheme="outline"></i>
+          </td>
+          <td><a target="_blank" [routerLink]='["/project",projectKey]'
+              [queryParams]="{f:i.filter.id}">{{i.filter.name}} <app-icon height="20" width="20"
+                icon="box-arrow-up-right"></app-icon>
+            </a></td>
+          <td>
+            <button nz-button nzType="default" (click)="delete(i)"><i nz-icon nzType="delete"
+                nzTheme="outline"></i></button>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</nz-card>
+<ng-template #boardModalContent let-params let-ref="modalRef">
+  <div *ngIf="boardForEdit">
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" class="form-control" required name="boardName" placeholder="Name"
+        [(ngModel)]="boardForEdit.name">
+    </div>
+    <div class="form-group mt-3 mb-3">
+      <nz-switch [(ngModel)]="boardForEdit.active" nzCheckedChildren="Active" nzUnCheckedChildren="In Active">
+      </nz-switch>
+      <small class="form-text text-muted">If no lane exists, board is disabled.</small>
+    </div>
+    <div class="form-group">
+      <nz-select *ngIf="filters" name="Filter" nzPlaceHolder="Filter" [(ngModel)]="boardForEdit.filter"
+        [compareWith]="compareFn">
+        <nz-option *ngFor="let a of filters" [nzLabel]="a.name" [nzValue]="a"></nz-option>
+      </nz-select>
+      <small class="form-text text-muted">only Open filters are available</small>
+    </div>
+  </div>
+</ng-template>

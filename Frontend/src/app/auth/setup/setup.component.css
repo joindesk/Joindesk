@@ -1,0 +1,56 @@
+.vertical-center {
+  min-height: 95%;
+  /* Fallback for browsers do NOT support vh unit */
+  min-height: 95vh;
+  /* These two lines are counted as one :-)       */
+  display: flex;
+  align-items: center;
+}
+
+.login-wrapper {
+  background: #96c0ff;
+  background: -webkit-linear-gradient( -135deg,#96c0ff,#ffb4a1);
+  background: -o-linear-gradient(-135deg,#96c0ff,#ffb4a1);
+  background: -moz-linear-gradient(-135deg,#96c0ff,#ffb4a1);
+  background: linear-gradient( -135deg,#96c0ff,#ffb4a1);
+}
+
+.login-box {
+  background-color: #ffffff;
+  border-radius: .8rem;
+  box-shadow: 0 4px 25px 0 rgba(0, 0, 0, .1);
+}
+
+.login-box .row {
+  height: 100%;
+}
+
+.form-group-default .form-control {
+  border-bottom: none !important;
+}
+
+.form-group-default .form-control:focus {
+  box-shadow: 0 0 0 1000px #fff inset !important;
+}
+
+.form-group label {
+  color: #41515E;
+  text-transform: none !important;
+  font-size: 14px;
+}
+
+.form-group {
+  background: #FAFAFA;
+  border: 1px solid #F6F6F6;
+  border-radius: 8px;
+}
+
+button.ant-btn {
+  border-radius: 8px;
+}
+
+.help {
+  font-size: 12px;
+  letter-spacing: 0.005em;
+  color: #9E9E9E;
+}

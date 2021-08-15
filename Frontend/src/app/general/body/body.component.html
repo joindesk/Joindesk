@@ -1,0 +1,15 @@
+<app-sidebar></app-sidebar>
+<div class="page-container" [style.padding-left]="ds.homeView ? '0px':'70px'">
+    <app-header></app-header>
+    <div class="page-content-wrapper" [@routeAnimations]="prepareRoute(mo)">
+        <div class="content mt-5" *ngIf="loading">
+            <div class="d-flex justify-content-center" style="color: #3850cb;">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        </div>
+        <router-outlet #mo="outlet"></router-outlet>
+        <app-footer></app-footer>
+    </div>
+</div>

@@ -1,0 +1,62 @@
+<nz-page-header class="manageAreaHeader" nzTitle="Component">
+  <nz-page-header-extra>
+    <button nz-button (click)="create()">Create</button>
+  </nz-page-header-extra>
+</nz-page-header>
+<div class="m-0 mt-4 row">
+  <div class="col-6">
+    <nz-table class="issueTable" nzShowPagination="false" *ngIf="components" #compTable [nzData]="components"
+      nzPageSize="999999" [nzNoResult]="createDocTemp">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let it of compTable.data">
+          <td class="v-align-middle">{{it.name}}
+          </td>
+          <td>
+            <a (click)="open(it.id)" class="btn btn-default btn-xs pull-right">
+              <app-icon height="18" width="18" icon="arrow-right-short"> </app-icon>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+      <ng-template #createDocTemp>
+        <img src="/assets/img/empty.svg" class="jdempty" width="200">
+      </ng-template>
+    </nz-table>
+  </div>
+  <div class="col-6">
+    <div class="card card-bordered" *ngIf="component">
+      <div class="card-header">
+        <div class="card-title">
+          <span *ngIf="!component.id">Create </span>{{component.name}}
+        </div>
+        <app-icon height="20" width="20" icon="x" class="pull-right cursorpointer" (click)="component = undefined">
+        </app-icon>
+        <app-icon height="20" width="20" icon="pencil" class="pull-right cursorpointer" (click)="component.edit = true"
+          *ngIf="!component.edit">
+        </app-icon>
+      </div>
+      <div class="card-body">
+        <div *ngIf="!component.edit">
+          <p>Name: {{component.name}}</p>
+        </div>
+        <form (ngSubmit)="save()" #componentForm="ngForm" ngNativeValidate *ngIf="component.edit">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" minlength="2" class="form-control" required name="cfName" placeholder="Name"
+              [(ngModel)]="component.name">
+          </div>
+          <button nz-button nzType="primary" *ngIf="!component.id">Create</button>
+          <button nz-button nzType="primary" *ngIf="component.id">Update</button>
+          <button nz-button nzType="danger" (click)="delete()" *ngIf="component.id">Delete</button>
+          <button nz-button nzType="default" (click)="cancel()">Cancel</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

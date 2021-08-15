@@ -1,0 +1,29 @@
+<div *ngIf="project">
+  <nz-page-header class="manageAreaHeader" [nzTitle]="project.name">
+    <nz-page-header-tags>
+      <nz-tag *ngIf="project.active" [nzColor]="'blue'">Active</nz-tag>
+      <nz-tag *ngIf="!project.active" [nzColor]="'red'">In Active</nz-tag>
+    </nz-page-header-tags>
+    <nz-page-header-content>
+      <nz-row>
+        <nz-col [nzSpan]="24">
+          <nz-statistic class="projectDesc" [nzTitle]="project.description" nzValue="">
+          </nz-statistic>
+        </nz-col>
+      </nz-row>
+      <nz-row [nzGutter]="16" class="mt-4">
+        <nz-col [nzSpan]="6">
+          <nz-statistic nzTitle="Key" [nzValue]="project.key"></nz-statistic>
+        </nz-col>
+        <nz-col [nzSpan]="6">
+          <nz-statistic nzTitle="Time tracking" [nzValue]="project.timeTracking.enabled ? 'Enabled': 'Disabled'">
+          </nz-statistic>
+        </nz-col>
+        <nz-col [nzSpan]="6">
+          <nz-statistic nzTitle="Lead" [nzValue]="project.lead.fullName + ' [' + project.lead.userName + ']'">
+          </nz-statistic>
+        </nz-col>
+      </nz-row>
+    </nz-page-header-content>
+  </nz-page-header>
+</div>

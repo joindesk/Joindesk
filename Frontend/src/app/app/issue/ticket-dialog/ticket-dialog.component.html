@@ -1,0 +1,78 @@
+<form (ngSubmit)="save()" #issueForm="ngForm" ngNativeValidate>
+  <div class="row">
+    <div class="col-8">
+      <div class="row">
+        <div class="col-6">
+          <div class="form-group form-group-default">
+            <label>Project</label>
+            <nz-select class="noBorder" name="project" required [(ngModel)]="issue.project" [compareWith]="compareFn"
+              nzPlaceHolder="Choose" nzShowSearch (ngModelChange)="changeProject()" nzAllowClear="false">
+              <nz-option *ngFor="let option of createableProjects" [nzValue]="option" [nzLabel]="option.name">
+              </nz-option>
+            </nz-select>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-group form-group-default">
+            <label>Issue Type</label>
+            <nz-select class="noBorder" name="issueType" required [(ngModel)]="issue.issueType"
+              [compareWith]="compareFn" nzPlaceHolder="Choose" nzShowSearch nzAllowClear="false">
+              <nz-option *ngFor="let option of issueTypes" [nzValue]="option" [nzLabel]="option.name"></nz-option>
+            </nz-select>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Summary</label>
+        <input type="text" class="form-control" required name="summary" placeholder="Summary"
+          [(ngModel)]="issue.summary">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <app-jd-editor [field]="'desc'" [editmode]="'create'" [type]="'edit'" [(desc)]="issue.description">
+        </app-jd-editor>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="form-group form-group-default">
+        <label>Assignee</label>
+        <nz-select class="noBorder" name="assignee" nzShowSearch required [(ngModel)]="issue.assignee"
+          [compareWith]="compareFn" nzPlaceHolder="Unassigned" nzAllowClear>
+          <nz-option *ngFor="let option of assignableMembers" [nzValue]="option" [nzLabel]="option.fullName">
+          </nz-option>
+        </nz-select>
+        <a *ngIf="showAssignToSelf" class="pl-2" style="color: #584b8d;" (click)="assignToMe()">Assign to me</a>
+      </div>
+      <div class="form-group form-group-default">
+        <label>Reporter</label>
+        <nz-select class="noBorder" name="reporter" nzShowSearch required [(ngModel)]="issue.reporter"
+          [compareWith]="compareFn" nzPlaceHolder="Choose" nzAllowClear="false">
+          <nz-option *ngFor="let option of assignableMembers" [nzValue]="option" [nzLabel]="option.fullName">
+          </nz-option>
+        </nz-select>
+      </div>
+      <div class="form-group form-group-default">
+        <label>Priority</label>
+        <nz-select class="noBorder" name="priority" required [(ngModel)]="issue.priority" nzPlaceHolder="Choose"
+          nzAllowClear="false">
+          <nz-option nzCustomContent nzValue="Urgent" nzLabel="Urgent">
+            <img src="/assets/img/priority-blocker.svg" /> Urgent
+          </nz-option>
+          <nz-option nzCustomContent nzValue="High" nzLabel="High"> <img src="/assets/img/priority-high.svg" />
+            High</nz-option>
+          <nz-option nzCustomContent nzValue="Normal" nzLabel="Normal"><img src="/assets/img/priority-normal.svg" />
+            Normal</nz-option>
+          <nz-option nzCustomContent nzValue="Low" nzLabel="Low"><img src="/assets/img/priority-low.svg" /> Low
+          </nz-option>
+        </nz-select>
+      </div>
+    </div>
+  </div>
+  <div class="drawer-footer">
+    <button nz-button nzType="primary" type="submit" [nzLoading]="isCreating" class="pull-right" *ngIf="!issue.id"
+      nz-button>Create
+      <app-icon height="18" width="18" icon="arrow-right-short"></app-icon>
+    </button>
+  </div>
+
+</form>

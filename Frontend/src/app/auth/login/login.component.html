@@ -1,0 +1,108 @@
+<div class="container-fluid h-100 login-wrapper">
+    <div class="row align-items-center h-100">
+        <div
+            class="col offset-sm-1 col-sm-8 offset-md-4 col-md-6 offset-xl-4 col-xl-4 offset-lg-3 col-lg-6 login-box p-4">
+            <nz-spin [nzSpinning]="loading">
+                <img src="assets/img/jd_logo.png" height="45" alt="logo" data-src="assets/img/jd_logo.png">
+                <p style="font-weight: bold;font-size: 24px;" class="text-center mt-4 mb-4">Sign in</p>
+                <div class="alert alert-danger mt-4 text-center" *ngIf="!isBrowser"><b>This browser version is not
+                        supported
+                    </b><br> Please use any latest browsers
+                </div>
+                <div class="row" *ngIf="isBrowser">
+                    <div class="col-12">
+                        <p *ngIf="showRegistration" class="mt-2 mb-3 help">Not a member yet? <span nz-button
+                                nzType="link" routerLink="/register" class="p-0 help">Register</span>
+                        </p>
+                        <form nz-form *ngIf="!currentLoginUser" [formGroup]="validateForm" class="login-form"
+                            (ngSubmit)="validate()">
+                            <nz-form-item>
+                                <nz-form-control nzHasFeedback nzErrorTip="Email is required">
+                                    <nz-input-group nzPrefixIcon="user">
+                                        <input type="text" nz-input formControlName="email"
+                                            placeholder="Email Address" />
+                                    </nz-input-group>
+                                </nz-form-control>
+                            </nz-form-item>
+                            <nz-form-item>
+                                <nz-form-control nzHasFeedback nzErrorTip="Password is required">
+                                    <nz-input-group nzPrefixIcon="lock">
+                                        <input type="password" nz-input formControlName="password"
+                                            placeholder="Password" />
+                                    </nz-input-group>
+                                </nz-form-control>
+                            </nz-form-item>
+                            <nz-form-item>
+                                <nz-form-control>
+                                    <label nz-checkbox formControlName="remember">
+                                        <span>Remember me</span>
+                                    </label>
+                                    <a class="login-form-forgot" routerLink="/forgot" class="login-form-forgot">Forgot
+                                        password</a>
+                                    <button nz-button class="login-form-button" [nzType]="'primary'">Log in</button>
+                                </nz-form-control>
+                            </nz-form-item>
+                        </form>
+                        <form id="form-check" class="p-t-15" role="form" *ngIf="false && !currentLoginUser"
+                            (ngSubmit)="f.form.valid && checkUser()" #f="ngForm" novalidate>
+                            <div class="form-group form-group-default required"><label>Email address</label><input
+                                    [ngClass]="{ 'ng-invalid': f.submitted && !username.valid }" class="form-control"
+                                    placeholder="you@domain.com" required="" name="emailInput" type="email"
+                                    [(ngModel)]="model.username" #username="ngModel">
+                            </div>
+                            <div *ngIf="f.submitted && !username.valid">
+                                <label class="error">Email is required</label>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col p-0">
+
+                                </div>
+                                <div class="col p-0">
+                                    <button [disabled]="loading" class="float-right pl-5 pr-5" nz-button
+                                        nzType="primary" type="submit">Sign in</button>
+                                </div>
+                            </div>
+                        </form>
+                        <form id="form-login" class="p-t-15" role="form" *ngIf="currentLoginUser"
+                            (ngSubmit)="f.form.valid && validate()" #f="ngForm" novalidate>
+                            <div class="form-group form-group-default required"><label>Input OTP</label><input
+                                    [ngClass]="{ 'ng-invalid': f.submitted && !password.valid }" class="form-control"
+                                    placeholder="enter passcode" required="" name="codeInput" type="email"
+                                    [(ngModel)]="model.password" #password="ngModel">
+                            </div>
+                            <div *ngIf="f.submitted && !password.valid">
+                                <label class="error">passcode is required</label>
+                            </div>
+                            <button [disabled]="loading" class="float-right mt-3 pl-5 pr-5" nz-button nzType="primary"
+                                type="submit">Sign in</button>
+                            <span class="clearfix"></span>
+                            <div class="row">
+                                <div class="col-6">
+                                    <button nz-button nz-dropdown [nzDropdownMenu]="optionsMenu">
+                                        options
+                                    </button>
+                                    <nz-dropdown-menu #optionsMenu="nzDropdownMenu">
+                                        <ul nz-menu nzSelectable>
+                                            <li *ngIf="currentLoginUser.mfaEnabled" (click)="changeMode('MFA')"
+                                                nz-menu-item>Authenticator</li>
+                                            <li *ngIf="currentLoginUser.slackEnabled" (click)="changeMode('SLACK')"
+                                                nz-menu-item>Slack</li>
+                                            <li (click)="changeMode('EMAIL')" nz-menu-item>Email</li>
+                                        </ul>
+                                    </nz-dropdown-menu>
+                                </div>
+                                <div class="col-6">
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <p style="border-top: 1px solid #F6F6F6;" class="pt-3 help">Any questions? mail us at support at
+                        joindeskapp dot com</p>
+                </div>
+            </nz-spin>
+        </div>
+    </div>
+</div>

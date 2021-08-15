@@ -1,0 +1,80 @@
+.filter-container {
+    padding: 2px 5px;
+    /* border: 1px solid #cecece38; */
+    border-radius: 15px;
+    margin: 2px;
+}
+
+.filterItem {
+    min-width: 200px;
+}
+
+.issueTitleExtra>button>i {
+    font-size: 18px;
+}
+
+.issueTitle {
+    font-family: Heebo;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 18px;
+    color: #001737;
+}
+
+.issueHeader {
+    padding: 10px 10px !important;
+}
+
+.filterBtn {
+    border: 1px solid #51459E;
+    color: #001737;
+}
+
+.issueType {
+    font-size: 1.5em;
+    color: #51459E;
+}
+
+.selectFilter {
+    font-weight: 500;
+    font-size: 12px;
+    margin-right: 10px;
+    color: #516078;
+    letter-spacing: 0.3px;
+}
+
+.applyFilterBtn {
+    bottom: 0;
+    right: 0;
+    position: fixed;
+    margin: 10px;
+    font-size: 1.3rem;
+    padding: 0.4rem 1rem;
+    height: auto;
+}
+
+.sortIcon {
+    color: #757575;
+}
+
+.sortableHeader:hover {
+    cursor: pointer;
+    background-color: #f1f1f1 !important;
+}
+
+.filterRule {
+    margin: 5px;
+    background: #e9e9e9;
+    cursor: pointer;
+    border-radius: 5px;
+    padding: 5px;
+    white-space: nowrap;
+}
+
+.filterRule:hover {
+    background: #ccc;
+}
+
+.operatorSel .active {
+    background: #cccccc;
+}

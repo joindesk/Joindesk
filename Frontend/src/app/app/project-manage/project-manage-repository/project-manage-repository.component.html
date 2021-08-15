@@ -1,0 +1,98 @@
+<nz-page-header class="manageAreaHeader" nzTitle="Repository">
+  <nz-page-header-extra>
+    <button nz-button (click)="create()">Create</button>
+  </nz-page-header-extra>
+</nz-page-header>
+<div class="m-0 mt-4 row">
+  <div class="col-6">
+    <nz-table class="issueTable" nzShowPagination="false" *ngIf="repos" #reposTable [nzData]="repos" nzPageSize="999999"
+      [nzNoResult]="createDocTemp">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Active</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let it of reposTable.data">
+          <td class="v-align-middle semi-bold">
+            {{it.name}}
+          </td>
+          <td class="v-align-middle">
+            {{it.repoType}}
+          </td>
+          <td class="v-align-middle">
+            <i class="fa" [class.fa-check]="it.active" [class.fa-times]="!it.active"></i>
+          </td>
+          <td>
+            <a (click)="open(it)" class="btn btn-default btn-xs pull-right">
+              <app-icon height="18" width="18" icon="arrow-right-short"> </app-icon>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+      <ng-template #createDocTemp>
+        <img src="/assets/img/empty.svg" class="jdempty" width="200">
+      </ng-template>
+    </nz-table>
+  </div>
+  <div class="col-6">
+    <div class="card card-bordered" *ngIf="repo">
+      <div class="card-header">
+        <div class="card-title">
+          <span *ngIf="!repo.id">Create </span>{{repo.name}}
+        </div>
+        <app-icon height="18" width="18" icon="x" class="pull-right" (click)="cancel()"></app-icon>
+        <app-icon height="18" width="18" icon="pencil" class="pull-right" (click)="repo.edit = true" *ngIf="!repo.edit">
+        </app-icon>
+      </div>
+      <div class="card-body">
+        <div *ngIf="!repo.edit">
+          <p>Repo URL: {{repo.repoUrl}}</p>
+          <br />
+          <p>Hook Endpoint: {{repo.hookEndpoint}}</p>
+          <p>Active: <i class="fa" [class.fa-check]="repo.active" [class.fa-times]="!repo.active"></i></p>
+        </div>
+        <form *ngIf="repo.edit" nz-form (ngSubmit)="save(vForm)" #vForm="ngForm" ngNativeValidate nzLayout="vertical">
+          <nz-form-item>
+            <nz-form-label [nzSpan]="5">Name</nz-form-label>
+            <nz-form-control nzHasFeedback [nzSpan]="12" nzErrorTip="Name is required">
+              <input nz-input [(ngModel)]="repo.name" name="vname" required />
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label [nzSpan]="5">Repo URL</nz-form-label>
+            <nz-form-control nzHasFeedback [nzSpan]="12" nzErrorTip="Repo URL is required">
+              <input nz-input type="text" [(ngModel)]="repo.repoUrl" name="repoUrl" required />
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label [nzSpan]="5" nzFor="repoType">Repo Type</nz-form-label>
+            <nz-form-control [nzSpan]="12">
+              <nz-select name="repoType" [(ngModel)]="repo.repoType">
+                <nz-option nzValue="GITHUB" nzLabel="Github"></nz-option>
+                <nz-option nzValue="GITLAB" nzDisabled="true" nzLabel="Gitlab"></nz-option>
+                <nz-option nzValue="BITBUCKET" nzDisabled="true" nzLabel="Bitbucket"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label [nzSpan]="5" nzFor="repoActive">Active</nz-form-label>
+            <nz-form-control [nzSpan]="12">
+              <nz-switch name="activeSwitch" [(ngModel)]="repo.active"></nz-switch>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-control [nzOffset]="7" [nzSpan]="12">
+              <button nz-button nzType="primary" *ngIf="!repo.id">Create</button>
+              <button nz-button nzType="primary" *ngIf="repo.id">Update</button>
+              <button nz-button nzType="default" (click)="cancel()">Cancel</button>
+            </nz-form-control>
+          </nz-form-item>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

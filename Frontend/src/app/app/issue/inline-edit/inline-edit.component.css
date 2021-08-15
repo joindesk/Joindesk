@@ -1,0 +1,71 @@
+textarea {
+    height: auto;
+}
+
+.fa-pencil {
+    color: #585858;
+    font-size: 12px;
+}
+
+.noneHolder {
+    color: #7d7d7d;
+    font-weight: 500;
+    font-size: 14px;
+    margin: 0;
+}
+
+.contentWrapper {
+    position: relative;
+}
+
+.buttonsWrapper {
+    position: absolute;
+    margin-top: 3px;
+    margin-right: 10px;
+    right: 0;
+    z-index: 9;
+}
+
+.buttonsWrapper>button {
+    margin-left: 5px;
+    height: 2.28571em;
+    border-radius: 3px;
+    margin-top: 2px;
+    padding: 0px 8px;
+    width: 32px;
+    border: none;
+    color: rgb(80, 95, 121) !important;
+    background: rgba(9, 30, 66, 0.04) !important;
+    box-shadow: rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px !important;
+}
+
+.buttonsWrapper>button:hover {
+    background: rgba(9, 30, 66, 0.1) !important;
+}
+
+.summary:focus {
+    border: 1px solid rgb(106, 186, 223) !important;
+}
+
+.summaryHighlight {
+    border: 1px solid rgb(106, 186, 223) !important;
+}
+
+.labelBtn {
+    background: #F3F3F4;
+    border-radius: 3px;
+    height: 20px;
+    padding: 5px 8px;
+    margin-right: 5px;
+    color: #414141;
+    font-family: Heebo;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 12px;
+    cursor: pointer;
+}
+
+.pencil .labelBtn {
+    background-color: #e4e4e4;
+}

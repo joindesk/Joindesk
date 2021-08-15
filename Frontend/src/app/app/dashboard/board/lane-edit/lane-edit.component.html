@@ -1,0 +1,29 @@
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">Lane</div>
+  </div>
+  <div class="card-body">
+    <form (ngSubmit)="save()" #issueForm="ngForm" ngNativeValidate>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" class="form-control" required name="laneName" placeholder="Name" [(ngModel)]="lane.name">
+      </div>
+      <div class="form-group">
+        <label>Order</label>
+        <input type="number" class="form-control" required name="laneOrder" placeholder="Order"
+          [(ngModel)]="lane.laneOrder">
+      </div>
+      <div class="form-group m-t-20" *ngIf="lane.id">
+        <label>Statuses ({{lane.statuses.length}} selected)</label>
+        <nz-select name="possibleStatuses" nzMode="multiple" nzPlaceHolder="None selected" [(ngModel)]="lane.statuses"
+          [compareWith]="compareFn">
+          <nz-option *ngFor="let a of lane.possibleStatuses" [nzLabel]="a.name" [nzValue]="a"></nz-option>
+        </nz-select>
+      </div>
+      <button type="submit" class="btn btn-primary" *ngIf="!lane.id">Create</button>
+      <button type="submit" class="btn btn-primary" *ngIf="lane.id">Update</button>
+      <button type="button" class="btn btn-danger" (click)="delete()" *ngIf="lane.id">Delete</button>
+      <button type="button" (click)="close()" class="btn btn-default">Cancel</button>
+    </form>
+  </div>
+</div>

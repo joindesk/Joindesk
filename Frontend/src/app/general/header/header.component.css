@@ -1,0 +1,35 @@
+.header {
+    justify-content: normal !important;
+}
+
+#headerRight {
+    right: 0;
+    position: absolute;
+}
+
+.projectSwitch {
+    margin-left: 1rem;
+    background: #ffffff !important;
+    font-family: Heebo;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    border: none;
+    color: #6453FF !important;
+}
+
+.projectSwitch:hover {
+    border: none !important;
+}
+
+.issueCreateHeaderBtn {
+    color: #6453FF !important;
+    background: #fff !important;
+    border: 1px solid #6453FF !important;
+}
+
+.issueCreateHeaderBtn:hover {
+    color: #fff !important;
+    background: #6453FF !important;
+    border: 1px solid #6453FF !important;
+}

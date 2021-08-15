@@ -1,0 +1,70 @@
+<nz-page-header [nzGhost]="false" nzTitle="Global Groups">
+  <nz-page-header-extra>
+    <button nzType="primary" nz-button (click)="create()">Create</button>
+  </nz-page-header-extra>
+</nz-page-header>
+<div class="m-0 mt-4 row">
+  <div class="col-6">
+    <nz-table class="issueTable" *ngIf="groups" #groupsTable [nzData]="groups" nzPageSize="999999"
+      [nzNoResult]="createDocTemp" nzShowPagination="false">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of groupsTable.data">
+          <td class="v-align-middle semi-bold">
+            {{r.name}}
+          </td>
+          <td>
+            <a (click)="openGroup(r)" class="btn btn-default btn-xs pull-right">
+              <app-icon height="18" width="18" icon="arrow-right-short"> </app-icon>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+      <ng-template #createDocTemp>
+        <img src="/assets/img/empty.svg" class="jdempty" width="200">
+      </ng-template>
+    </nz-table>
+  </div>
+  <div class="col-6">
+    <div class="card card-bordered" *ngIf="group">
+      <div class="card-header">
+        <div class="card-title">
+          <span *ngIf="!group.id">Create </span>{{group.name}}
+        </div>
+      </div>
+      <div class="card-body">
+        <p>
+        <form (ngSubmit)="save()" #issueTypeForm="ngForm" ngNativeValidate>
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" class="form-control" minlength="4" maxlength="50" required name="groupName"
+              placeholder="Name" [(ngModel)]="group.name">
+          </div>
+          <div class="form-group m-t-20">
+            <label>Authorities ({{group.authorityCodes.length}} selected)</label>
+            <nz-select name="Authorities" nzMode="multiple" nzPlaceHolder="Authorities"
+              [(ngModel)]="group.authorityCodes">
+              <nz-option *ngFor="let a of authorityCodes" [nzLabel]="a" [nzValue]="a"></nz-option>
+            </nz-select>
+          </div>
+          <div class="form-group m-t-20">
+            <label>Members ({{group.users.length}} selected)</label>
+            <nz-select name="Members" nzMode="multiple" nzPlaceHolder="Members" [(ngModel)]="group.users" [compareWith]="compareFn">
+              <nz-option *ngFor="let a of members" [nzLabel]="a.fullName" [nzValue]="a"></nz-option>
+            </nz-select>
+          </div>
+          <button type="submit" class="ml-1" nz-button nzType="primary" *ngIf="!group.id">Create</button>
+          <button type="submit" class="ml-1" nz-button nzType="primary" *ngIf="group.id">Update</button>
+          <button type="button" class="ml-1" nz-button nzType="danger" (click)="delete()"
+            *ngIf="group.id">Delete</button>
+          <button type="button" (click)="cancel()" class="ml-1" nz-button nzType="default">Cancel</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

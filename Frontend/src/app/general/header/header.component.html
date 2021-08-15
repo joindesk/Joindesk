@@ -1,0 +1,73 @@
+<div class="header light bg-white no-shadow">
+  <div class="brand inline">
+    <a routerLink="/" class="btn-link toggle-sidebar">
+      <img src="/assets/img/jd_logo.png" height="35" alt="Joindesk" data-src="/assets/img/jd_logo.png">
+    </a>
+  </div>
+  <div class="ml-3 b-l b-grey">
+    <button class="btn projectSwitch" nz-dropdown [nzDropdownMenu]="projectSwitchMenu"
+      *ngIf="this.dashboardService.currentProject">
+      {{this.dashboardService.currentProject.name}}
+      <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10.2543 1L6.1196 5.22798L1.92271 1.09326L1.05225 1.99482L6.15069 7L11.1559 1.87047L10.2543 1Z"
+          fill="#6453FF" stroke="#6453FF" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+    <nz-dropdown-menu #projectSwitchMenu="nzDropdownMenu">
+      <ul nz-menu *ngIf="authenticationService.projects">
+        <li *ngFor="let p of authenticationService.projects"
+          [nzDisabled]="p.key == this.dashboardService.currentProject.key" [routerLink]='["/project",p.key]'
+          nz-menu-item>
+          {{p.name}}</li>
+      </ul>
+    </nz-dropdown-menu>
+    <button class="ml-3 issueCreateHeaderBtn" nz-button nzType="primary" *ngIf="authenticationService.canCreate"
+      (click)="openComponent()">Create</button>
+  </div>
+  <div class="d-flex align-items-center pr-2" id="headerRight">
+    <ul class="no-margin hidden-sm-down no-style">
+      <li class="inline" *ngIf="authenticationService.isSuperAdmin()">
+        <a nzTooltipTitle="Administration" nz-tooltip nzTooltipPlacement="right" style="border: none;"
+          [routerLink]='["/admin/manage","project"]' class="btn btn-default createTicket">
+          <img src="/assets/img/admin_icon.svg" alt=""></a>
+      </li>
+    </ul>
+    <div class="dropdown pull-right hidden-md-down">
+      <button class="profile-dropdown-toggle" nz-dropdown [nzDropdownMenu]="accountDropdown" nzTrigger="click"
+        nzBackdrop="false">
+        <app-usermedia *ngIf="myAccountService.user" [s]="'d32'" [tooltip]="myAccountService.user.fullName"
+          [tooltip]="myAccountService.user.fullName" [user]="myAccountService.user" [pic]="myAccountService.user.pic">
+        </app-usermedia>
+      </button>
+      <nz-dropdown-menu #accountDropdown="nzDropdownMenu">
+        <ul nz-menu>
+          <li nz-menu-item routerLink="/myaccount"><i nz-icon nzType="user" nzTheme="outline"></i> Account</li>
+          <!-- <li nz-menu-item routerLink="/worklog"><i nz-icon nzType="clock-circle" nzTheme="outline"></i> Worklog</li> -->
+          <li nz-menu-item (click)="logout()"><i nz-icon nzType="logout" nzTheme="outline"></i> Logout</li>
+        </ul>
+      </nz-dropdown-menu>
+    </div>
+  </div>
+</div>
+<nz-modal [(nzVisible)]="authenticationService.connectivityError" nzTitle="Connectivity Error" nzMaskClosable="false"
+  [nzFooter]="" nzClosable="false">
+  <div class="text-center">
+    We are facing issue communicating with our servers<br>
+    <button nz-button nzType="primary" class="mt-3" (click)="authenticationService.retry()">Retry</button>
+  </div>
+  <div *nzModalFooter></div>
+</nz-modal>
+<nz-modal [(nzVisible)]="authenticationService.authError" nzTitle="Authentication Error" nzMaskClosable="false"
+  [nzFooter]="" nzClosable="false">
+  <div class="text-center">
+    You are logged out<br>
+    <button nz-button nzType="primary" class="mt-3" routerLink="/login">Login</button>
+  </div>
+  <div *nzModalFooter></div>
+</nz-modal>
+<ng-template #createdNotificationTemplate let-data="data" let-notification>
+  Issue has been created. <a nz-button nzType="default" nzSize="small" class="createdBtn"
+    (click)="openIssue(data.keyPair);notification.close()">{{data.keyPair}}</a>
+</ng-template>
+<ng-template #createContainer>
+</ng-template>

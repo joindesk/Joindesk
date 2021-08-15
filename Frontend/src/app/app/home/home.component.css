@@ -1,0 +1,55 @@
+.btn-overview {
+    border: none;
+    background: none !important;
+}
+
+.bg-0 {
+    background: linear-gradient(45deg, #e0d2ff 0%, #ffe5f8 59%, #fff 100%);
+    box-shadow: 0px 1px 5px 5px #ececec !important;
+}
+
+.card-title {
+    font-weight: 400;
+    color: #525252;
+}
+
+.card-title>span {
+    color: grey;
+}
+
+.ant-card-head-title {
+    font-family: Heebo;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 18px;
+    color: #001737;
+}
+
+.progress {
+    height: 6px;
+    border-radius: 1rem;
+}
+
+.progress-bar {
+    border-radius: 1rem;
+    background-color: #2FD0A5 !important;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 2fr;
+    gap: 10px 10px;
+    grid-template-areas:
+      "Project-Overview Assigned-To-me Worklog"
+      "Project-Overview Due Due";
+  }
+  
+  .Project-Overview { grid-area: Project-Overview; }
+  
+  .Assigned-To-me { grid-area: Assigned-To-me; }
+  
+  .Worklog { grid-area: Worklog; }
+  
+  .Due { grid-area: Due; }
+  

@@ -1,0 +1,66 @@
+<nz-page-header [nzGhost]="false" nzTitle="App Configuration"></nz-page-header>
+<div class="m-0 mt-4 row">
+  <div class="col-6">
+    <form (ngSubmit)="save()" *ngIf="config" #issueTypeForm="ngForm" ngNativeValidate>
+      <div class="form-group">
+        <label>Base URL</label>
+        <input type="text" class="form-control" required name="baseUrl" placeholder="https://joindeskapp.com"
+          [(ngModel)]="config.baseUrl">
+      </div>
+      <div class="form-group">
+        <label>Timezone</label>
+        <nz-select name="Timezone" nzPlaceHolder="Timezone" [(ngModel)]="config.timezone">
+          <nz-option *ngFor="let a of config.timezones" [nzLabel]="a" [nzValue]="a"></nz-option>
+        </nz-select>
+      </div>
+      <div class="form-group">
+        <label>Start Time</label>
+        <input type="time" class="form-control" required name="startTime" placeholder="Start Time"
+          [(ngModel)]="config.start">
+      </div>
+      <div class="form-group">
+        <label>End Time</label>
+        <input type="time" class="form-control" required name="endTime" placeholder="End Time" [(ngModel)]="config.end">
+      </div>
+      <!-- <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" name="slackCheck" [(ngModel)]="config.slackEnabled">
+        <label class="form-check-label" for="slackCheck">Slack Enabled ?</label>
+      </div>
+      <div class="form-group form-check" *ngIf="config.slackEnabled && !config.slackConnected">
+        <a
+          href="https://slack.com/oauth/v2/authorize?client_id={{config.slackClientID}}&scope=app_mentions:read,channels:history,channels:read,chat:write,chat:write.customize,im:read,im:write,team:read,users.profile:read,users:read,users:read.email,users:write,mpim:read,groups:read,usergroups:read"><img
+            alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png"
+            srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"></a>
+      </div> -->
+      <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" name="selfRegistrationEmailEnabledCheck"
+          [(ngModel)]="config.selfRegistrationEmailEnabled">
+        <label class="form-check-label" for="selfRegistrationEmailEnabledCheck">Self Registration via Email</label>
+      </div>
+      <div class="form-group form-check ml-4" *ngIf="config.selfRegistrationEmailEnabled">
+        <input type="checkbox" class="form-check-input" name="selfRegistrationRequireEmailReviewCheck"
+          [(ngModel)]="config.selfRegistrationRequireEmailReview">
+        <label class="form-check-label" for="selfRegistrationRequireEmailReviewCheck">Manual Activation ?</label>
+      </div>
+      <div class="form-group ml-4" *ngIf="config.selfRegistrationEmailEnabled">
+        <label class="form-check-label" for="selfRegistrationDomainsCheck">Allowed Domains (seperated by
+          comma)</label>
+        <input type="text" class="form-control" name="selfRegistrationDomainsCheck"
+          [(ngModel)]="config.selfRegistrationDomains" placeholder="example.com,company.com">
+      </div>
+      <!-- <div class="form-group form-check" *ngIf="config.slackEnabled">
+            <input type="checkbox" class="form-check-input" name="selfRegistrationSlackEnabledCheck"
+              [(ngModel)]="config.selfRegistrationSlackEnabled">
+            <label class="form-check-label" for="selfRegistrationSlackEnabledCheck">Self Registration via Slack</label>
+          </div>
+          <div class="form-group form-check ml-4" *ngIf="config.slackEnabled && config.selfRegistrationSlackEnabled">
+            <input type="checkbox" class="form-check-input" name="selfRegistrationRequireSlackReviewCheck"
+              [(ngModel)]="config.selfRegistrationRequireSlackReview">
+            <label class="form-check-label" for="selfRegistrationRequireSlackReviewCheck">Manual Activation ?</label>
+          </div> -->
+      <div class="alert alert-error" *ngIf="config.slackFailure">{{config.slackFailure}}</div>
+      <button type="submit" class="mt-2" nz-button nzType="primary">Update</button>
+    </form>
+    <div class="alert alert-warning" *ngIf="!config">Loading config information</div>
+  </div>
+</div>

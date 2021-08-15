@@ -1,0 +1,46 @@
+textarea {
+    height: auto;
+}
+
+.pencil {
+    background-color: #e4e4e452;
+    border-radius: 5px;
+}
+
+.editable {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.fa-pencil {
+    color: #a7a7a7;
+    font-size: 12px;
+}
+
+.contentWrapper {
+    position: relative;
+}
+
+.buttonsWrapper {
+    position: absolute;
+    margin-top: 3px;
+    right: 0;
+    z-index: 9;
+}
+
+.buttonsWrapper>button {
+    margin-left: 5px;
+    height: 2.28571em;
+    border-radius: 3px;
+    margin-top: 2px;
+    padding: 0px 8px;
+    width: 32px;
+    border: none;
+    color: rgb(80, 95, 121) !important;
+    background: rgba(9, 30, 66, 0.04) !important;
+    box-shadow: rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px !important;
+}
+
+.buttonsWrapper>button:hover {
+    background: rgba(9, 30, 66, 0.1) !important;
+}

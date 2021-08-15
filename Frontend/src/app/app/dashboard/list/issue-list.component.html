@@ -1,0 +1,172 @@
+<ng-template #spinnerIndicatorTemplate><i nz-icon nzType="loading" style="font-size: 24px;"></i> </ng-template>
+<div nz-row class="p-3" *ngIf="data">
+    <div nz-col nzSpan="24">
+        <nz-table class="issueTable" [nzLoadingIndicator]="spinnerIndicatorTemplate" [nzLoading]="loading" #issuesTable
+            [nzData]="data.issues" nzShowPagination="false" nzPageSize="999999"
+            (nzCurrentPageDataChange)="currentPageDataChange($event)">
+            <thead (nzSortChange)="sort($event)" nzSingleSort>
+                <tr>
+                    <th nzShowCheckbox [(nzChecked)]="isAllDisplayDataChecked" [nzIndeterminate]="isIndeterminate"
+                        (nzCheckedChange)="checkAll($event)"></th>
+                    <th style="padding: 0px !important;">T</th>
+                    <th class="sortableHeader" (click)="sort('Key')">Key <i nz-icon class="sortIcon"
+                            [nzType]="getSort('Key')" nzTheme="outline"></i>
+                    </th>
+                    <th>Summary</th>
+                    <th *ngIf="showColumn('status')">Status</th>
+                    <th class="sortableHeader" (click)="sort('Priority')" *ngIf="showColumn('priority')">
+                        {{customize.compact ? 'P': 'Priority'}} <i nz-icon class="sortIcon"
+                            [nzType]="getSort('Priority')" nzTheme="outline"></i>
+                    </th>
+                    <th class="sortableHeader" (click)="sort('Assignee')" *ngIf="showColumn('assignee')">
+                        {{customize.compact ? 'A': 'Assignee'}} <i nz-icon class="sortIcon"
+                            [nzType]="getSort('Assignee')" nzTheme="outline"></i>
+                    </th>
+                    <th class="sortableHeader" (click)="sort('Reporter')" *ngIf="showColumn('reporter')">
+                        {{customize.compact ? 'R': 'Reporter'}} <i nz-icon class="sortIcon"
+                            [nzType]="getSort('Reporter')" nzTheme="outline"></i>
+                    </th>
+                    <th class="sortableHeader" (click)="sort('start_date')" *ngIf="showColumn('start_date')">Start <i
+                            nz-icon class="sortIcon" [nzType]="getSort('start_date')" nzTheme="outline"></i>
+                    </th>
+                    <th class="sortableHeader" (click)="sort('end_date')" *ngIf="showColumn('end_date')">End <i nz-icon
+                            class="sortIcon" [nzType]="getSort('end_date')" nzTheme="outline"></i>
+                    </th>
+                    <th class="sortableHeader" (click)="sort('Due')" *ngIf="showColumn('due_date')">Due <i nz-icon
+                            class="sortIcon" [nzType]="getSort('Due')" nzTheme="outline"></i>
+                    </th>
+                    <th class="sortableHeader" (click)="sort('Created')" *ngIf="showColumn('created')">Created <i
+                            nz-icon class="sortIcon" [nzType]="getSort('Created')" nzTheme="outline"></i>
+                    </th>
+                    <th class="sortableHeader" (click)="sort('Updated')" *ngIf="showColumn('updated')">Updated <i
+                            nz-icon class="sortIcon" [nzType]="getSort('Updated')" nzTheme="outline"></i>
+                    </th>
+                    <th *ngIf="showColumn('resolution')">Resolution</th>
+                    <th *ngIf="showColumn('resolved')">Resolved</th>
+                    <th *ngIf="showColumn('version')">Version</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let i of issuesTable.data" (contextmenu)="contextMenu($event, trcontextMenu, i)"
+                    (click)="check(i.keyPair, $event)" [class.active]="mapOfCheckedId[i.keyPair]"
+                    (click)="openIssue(i.keyPair)" class="cursorpointer">
+                    <td nzShowCheckbox [(nzChecked)]="mapOfCheckedId[i.keyPair]" (nzCheckedChange)="refreshStatus()">
+                    </td>
+                    <td style="padding: 0px !important;">
+                        <i nz-tooltip nzTooltipTitle="{{i.issueType.name}}"
+                            class="issueType fa fa-{{i.issueType.iconUrl}}"></i>
+                    </td>
+                    <td style="white-space: nowrap;">
+                        {{i.project.key}}-{{i.key}}
+                    </td>
+                    <td style="color:#2C2B37">{{i.summary}}</td>
+                    <td *ngIf="showColumn('status')">
+                        <span class="p-t-5 m-l-5 p-b-5" style="white-space: nowrap;"
+                            class="issueStatus issueStatus-{{i.currentStep.issueStatus.issueLifeCycle}}">{{i.currentStep.issueStatus.name}}</span>
+                    </td>
+                    <td style="white-space: nowrap;" *ngIf="showColumn('priority')">
+                        <div nz-tooltip [nzTooltipTitle]="i.priority" nzTooltipPlacement="left">
+                            <img *ngIf="i.priority === 'Urgent'" src="/assets/img/priority-blocker.svg" alt=""
+                                height="16" />
+                            <img *ngIf="i.priority === 'High'" src="/assets/img/priority-high.svg" alt="" height="16" />
+                            <img *ngIf="i.priority === 'Normal'" src="/assets/img/priority-normal.svg" alt=""
+                                height="16" />
+                            <img *ngIf="i.priority === 'Low'" src="/assets/img/priority-low.svg" alt="" height="16" />
+                            <span class="ml-2" *ngIf="!customize.compact">{{i.priority}}</span>
+                        </div>
+                    </td>
+                    <td *ngIf="showColumn('assignee')">
+                        <div class="d-flex align-items-center">
+                            <app-usermedia *ngIf="i.assignee" [user]="i.assignee" nz-tooltip
+                                [nzTooltipTitle]="i.assignee.fullName" [tooltip]="i.assignee.fullName" [s]="'d24'"
+                                [pic]="i.assignee.pic">
+                            </app-usermedia>
+                            <app-usermedia *ngIf="!i.assignee" [tooltip]="'?'" [s]="'d24'" [pic]="'unassigned'">
+                            </app-usermedia>
+                            <div class="p-l-10" *ngIf="!customize.compact">
+                                <span class="text-master">{{i.assignee ? i.assignee.fullName : 'unassigned'}}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td *ngIf="showColumn('reporter')">
+                        <div class="d-flex align-items-center">
+                            <app-usermedia *ngIf="i.reporter" [user]="i.reporter" [s]="'d24'" nz-tooltip
+                                [nzTooltipTitle]="i.reporter.fullName" [tooltip]="i.reporter.fullName"
+                                [pic]="i.reporter.pic">
+                            </app-usermedia>
+                            <div class="p-l-10" *ngIf="!customize.compact">
+                                <span class="text-master">{{i.reporter ? i.reporter.fullName : 'unassigned'}}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td *ngIf="showColumn('start_date')"><span *ngIf="i.startDate">{{i.startDate | date}}</span>
+                        <span *ngIf="!i.startDate">-</span>
+                    </td>
+                    <td *ngIf="showColumn('end_date')"><span *ngIf="i.endDate">{{i.endDate | date}}</span>
+                        <span *ngIf="!i.endDate">-</span>
+                    </td>
+                    <td *ngIf="showColumn('due_date')"><span *ngIf="i.dueDate"
+                            [class.alreadyDue]="isDue(i.dueDate)">{{i.dueDate |
+                            date}}</span>
+                        <span *ngIf="!i.dueDate">-</span>
+                    </td>
+                    <td *ngIf="showColumn('created')" title="{{i.created | date: 'medium'}} ">{{i.created | timeAgo}}
+                    </td>
+                    <td *ngIf="showColumn('updated')"><span *ngIf="i.updated"
+                            title="{{i.updated | date: 'medium'}}">{{i.updated |
+                            timeAgo}}</span></td>
+                    <td *ngIf="showColumn('resolution')"><span *ngIf="i.resolution">{{i.resolution.name}}</span></td>
+                    <td *ngIf="showColumn('resolved')"><span *ngIf="i.resolvedDate"
+                            title="{{i.resolvedDate | date: 'medium'}}">{{i.resolvedDate | timeAgo}}</span></td>
+                    <td *ngIf="showColumn('version')" style="word-break: break-word;max-width: 6vw;">
+                        <span class="labelBtn" *ngFor="let a of i.versions; let l = last">{{a.name}} <span *ngIf="!l">,
+                            </span></span>
+                    </td>
+                </tr>
+            </tbody>
+        </nz-table>
+        <nz-dropdown-menu #trcontextMenu="nzDropdownMenu">
+            <ul nz-menu>
+                <li nz-menu-item (click)="quick('assign', '-1')">Assign to Me [{{currentSelected}}]</li>
+                <!-- <li nz-menu-item nzDisabled>disabled menu item</li> -->
+                <li nz-submenu nzTitle="Assign to [{{currentSelected}}]">
+                    <ul>
+                        <li *ngFor="let u of filter.possibleMembers" nz-menu-item (click)="quick('assign', u.id)">
+                            {{u.fullName}}
+                        </li>
+                    </ul>
+                </li>
+                <li nz-submenu *ngIf="filter.possibleVersions.length > 0" nzTitle="Add version [{{currentSelected}}]">
+                    <ul>
+                        <li *ngFor="let v of filter.possibleVersions" nz-menu-item (click)="quick('version', v.id)">
+                            {{v.name}}
+                        </li>
+                    </ul>
+                </li>
+                <li nz-submenu nzTitle="Priority [{{currentSelected}}]">
+                    <ul>
+                        <li nz-menu-item (click)="quick('priority', 'Urgent')">Urgent</li>
+                        <li nz-menu-item (click)="quick('priority', 'High')">High</li>
+                        <li nz-menu-item (click)="quick('priority', 'Normal')">Normal</li>
+                        <li nz-menu-item (click)="quick('priority', 'Low')">Low</li>
+                    </ul>
+                </li>
+                <li nz-submenu nzTitle="Check">
+                    <ul>
+                        <li nz-menu-item (click)="checkAll(true)">All</li>
+                        <li nz-menu-item (click)="checkAll(false)">None</li>
+                    </ul>
+                </li>
+            </ul>
+        </nz-dropdown-menu>
+        <div class="mt-2">
+            <nz-pagination class="pull-right" [nzPageIndex]="data.pageIndex" [nzTotal]="data.total" nzShowSizeChanger
+                [nzPageSize]="data.pageSize" (nzPageIndexChange)="paginate($event)"
+                (nzPageSizeChange)="pageSizeChange($event)" [nzPageSizeOptions]="pageSizeOptions"
+                [nzShowTotal]="rangeTemplate">
+            </nz-pagination>
+            <ng-template #rangeTemplate let-range="range" let-total> {{ range[0] }}-{{ range[1] }} of {{ total }}
+            </ng-template>
+        </div>
+    </div>
+</div>

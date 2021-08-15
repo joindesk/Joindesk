@@ -1,0 +1,49 @@
+.wikiHeader .ant-breadcrumb {
+    line-height: 2 !important;
+}
+
+.wikiHeader .ant-breadcrumb a {
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    color: #424D5F !important;
+}
+
+.wikiHeader nz-page-header-title {
+    font-weight: 400;
+    font-size: 14px;
+}
+
+.wikiTitle[placeholder]:empty:before {
+    content: attr(placeholder);
+    color: rgb(148, 148, 148);
+}
+
+.wikiTitle[placeholder]:empty:focus:before {
+    content: "";
+}
+
+.wikiEditBtn {
+    background: none !important;
+    color: #51459E !important;
+}
+
+.wikiUpdateBtn {
+    color: white !important;
+}
+
+.wikiTitle {
+    font-weight: 600;
+    font-size: 32px;
+    margin-top: 10px;
+    line-height: 32px;
+}
+
+.wikiTitle:focus {
+    outline: none;
+}
+
+nz-layout.wiki-area {
+    height: calc(100% - 60px);
+    position: absolute;
+    width: 100%;
+  }

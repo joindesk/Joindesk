@@ -1,0 +1,41 @@
+<div class="row vertical-center justify-content-center align-items-center" style="margin:0">
+    <div class="col-3" style="padding: 30px;">
+        <div class="card">
+            <div class="card-body">
+                <div class="mx-auto text-center m-20">
+                    <img class="text-center" src="/assets/img/logo_blue.png" alt="logo"
+                        data-src="/assets/img/logo_blue.png" width="148" height="42">
+                </div>
+                <div class="alert alert-danger m-t-20" *ngIf="errorMessage">{{errorMessage}}</div>
+                <div class="alert alert-info m-t-5" *ngIf="infoMessage">{{infoMessage}}</div>
+                <form name="form" (ngSubmit)="f.form.valid && register()" #f="ngForm" ngNativeValidate
+                    *ngIf="registerAllowed">
+                    <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !fullName.valid }">
+                        <label for="fullName">fullName</label>
+                        <input type="text" class="form-control" name="fullName" [(ngModel)]="model.fullName"
+                            #fullName="ngModel" required />
+                        <div *ngIf="f.submitted && !fullName.valid" class="help-block text-danger">Name is
+                            required
+                        </div>
+                    </div>
+                    <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !email.valid }">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" name="email" [(ngModel)]="model.email" #email="ngModel"
+                            required />
+                        <div *ngIf="f.submitted && !email.valid" class="help-block text-danger">Email is
+                            required
+                        </div>
+                    </div>
+                    <div class="form-group text-right">
+                        <img *ngIf="loading"
+                            src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                        <button [disabled]="loading" class="mt-4 btn btn-block btn-primary">Register</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="mx-auto text-center m-20">
+            <a routerLink="/login">Sign in</a>
+        </div>
+    </div>
+</div>

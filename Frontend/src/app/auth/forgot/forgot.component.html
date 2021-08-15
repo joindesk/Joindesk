@@ -1,0 +1,73 @@
+<div class="container-fluid h-100 login-wrapper">
+    <div class="row align-items-center h-100">
+        <div
+            class="col offset-sm-1 col-sm-8 offset-md-4 col-md-6 offset-xl-4 col-xl-4 offset-lg-3 col-lg-6 login-box p-4">
+            <!-- <div class="col col-sm-8 col-md-10 col-lg-8 col-xl-6 login-box"> -->
+            <nz-spin [nzSpinning]="loading">
+                <img src="assets/img/jd_logo.png" height="45" alt="logo" data-src="assets/img/jd_logo.png">
+                <p style="font-weight: bold;font-size: 24px;" class="text-center mt-4 mb-4">Forgot
+                    Password</p>
+                <div class="row">
+                    <div class="col-12">
+                        <form nz-form nzLayout="horizontal" [formGroup]="validateForm" class="login-form">
+                            <nz-form-item>
+                                <nz-form-label nzSpan="10">Email Address</nz-form-label>
+                                <nz-form-control nzSpan="14" nzHasFeedback [nzErrorTip]="pwdErrorTpl">
+                                    <input type="text" nz-input formControlName="email" />
+                                </nz-form-control>
+                            </nz-form-item>
+                            <nz-form-item>
+                                <nz-form-label nzSpan="10">Token</nz-form-label>
+                                <nz-form-control nzSpan="14" nzHasFeedback [nzErrorTip]="pwdErrorTpl">
+                                    <input type="text" nz-input formControlName="token" />
+                                </nz-form-control>
+                            </nz-form-item>
+                            <nz-form-item>
+                                <nz-form-label nzSpan="10">Password</nz-form-label>
+                                <nz-form-control nzSpan="14" nzHasFeedback [nzErrorTip]="pwdErrorTpl">
+                                    <input type="password" nz-input formControlName="password" />
+                                </nz-form-control>
+                            </nz-form-item>
+                            <nz-form-item>
+                                <nz-form-label nzSpan="10">Confirm Password</nz-form-label>
+                                <nz-form-control nzSpan="14" nzHasFeedback [nzErrorTip]="pwdErrorTpl">
+                                    <input nz-input type="password" formControlName="confirmPassword" />
+                                </nz-form-control>
+                            </nz-form-item>
+                            <div class="row">
+                                <div class="col"><button nz-button class="login-form-button"
+                                        (click)="submit('request_token')" [nzType]="'primary'">Request
+                                        Token</button>
+                                </div>
+                                <div class="col">
+                                    <button nz-button class="login-form-button" (click)="submit('reset')"
+                                        [nzType]="'primary'">Reset</button>
+                                </div>
+                            </div>
+                            <ng-template #pwdErrorTpl let-control>
+                                <ng-container *ngIf="control.hasError('required')">
+                                    Field is required &nbsp;
+                                </ng-container>
+                                <ng-container *ngIf="control.hasError('minlength')">
+                                    Minimum length 8 &nbsp;
+                                </ng-container>
+                                <ng-container *ngIf="control.hasError('maxlength')">
+                                    Max length 50 &nbsp;
+                                </ng-container>
+                                <ng-container *ngIf="control.hasError('confirm')">
+                                    Passwords are not matching &nbsp;
+                                </ng-container>
+                            </ng-template>
+                        </form>
+                        <a class="login-form-forgot mt-3" routerLink="/login">back
+                            to Login</a>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <p style="border-top: 1px solid #F6F6F6;" class="pt-3 help">Any questions? mail us at support at
+                        joindeskapp dot com</p>
+                </div>
+            </nz-spin>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,103 @@
+<div class="dockmodal" [class.minimized]="isMinimized" [style.width.%]="calcWidth()" *ngIf="visible">
+    <div class="dock-modal">
+        <div class="dock-modal-header">
+            <span class="pl-3" style="flex:1; font-size: medium;">Create Issue</span>
+            <app-icon class="dock-modal-icon" color="#fff" height="20" width="20" icon="arrows-angle-contract"
+                *ngIf="!isMinimized" (click)="isMinimized = true">
+            </app-icon>
+            <app-icon class="dock-modal-icon" color="#fff" height="20" width="20" icon="arrows-angle-expand"
+                *ngIf="isMinimized" (click)="isMinimized = false;">
+            </app-icon>
+            <app-icon class="dock-modal-icon" color="#fff" height="20" width="20" icon="x" (click)="close()">
+            </app-icon>
+        </div>
+        <div class="dock-modal-content p-2" [class.hide]="isMinimized">
+            <form (ngSubmit)="save()" #issueForm="ngForm" ngNativeValidate>
+                <div class="row">
+                    <div class="col-8 col-xs-12">
+                        <div class="row">
+                            <div class="col-6 col-xs-12">
+                                <div class="form-group form-group-default">
+                                    <label>Project</label>
+                                    <nz-select class="noBorder" name="project" required [(ngModel)]="issue.project"
+                                        [compareWith]="compareFn" nzPlaceHolder="Choose" nzShowSearch
+                                        (ngModelChange)="changeProject()" nzAllowClear="false">
+                                        <nz-option *ngFor="let option of createableProjects" [nzValue]="option"
+                                            [nzLabel]="option.name">
+                                        </nz-option>
+                                    </nz-select>
+                                </div>
+                            </div>
+                            <div class="col-6 col-xs-12">
+                                <div class="form-group form-group-default">
+                                    <label>Issue Type</label>
+                                    <nz-select class="noBorder" name="issueType" required [(ngModel)]="issue.issueType"
+                                        [compareWith]="compareFn" nzPlaceHolder="Choose" nzShowSearch
+                                        nzAllowClear="false">
+                                        <nz-option *ngFor="let option of issueTypes" [nzValue]="option"
+                                            [nzLabel]="option.name"></nz-option>
+                                    </nz-select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Summary</label>
+                            <input type="text" class="form-control" required name="summary" placeholder="Summary"
+                                [(ngModel)]="issue.summary">
+                        </div>
+                        <div class="form-group" style="min-height: 230px;">
+                            <label>Description</label>
+                            <app-jd-editor [field]="'desc'" [editmode]="'create'" [type]="'edit'"
+                                [(desc)]="issue.description">
+                            </app-jd-editor>
+                        </div>
+                    </div>
+                    <div class="col-4 col-xs-12">
+                        <div class="form-group form-group-default">
+                            <label>Assignee</label>
+                            <nz-select class="noBorder" name="assignee" nzShowSearch required
+                                [(ngModel)]="issue.assignee" [compareWith]="compareFn" nzPlaceHolder="Unassigned"
+                                nzAllowClear>
+                                <nz-option *ngFor="let option of assignableMembers" [nzValue]="option"
+                                    [nzLabel]="option.fullName">
+                                </nz-option>
+                            </nz-select>
+                            <a *ngIf="showAssignToSelf" class="pl-2" style="color: #584b8d;"
+                                (click)="assignToMe()">Assign to me</a>
+                        </div>
+                        <div class="form-group form-group-default">
+                            <label>Reporter</label>
+                            <nz-select class="noBorder" name="reporter" nzShowSearch required
+                                [(ngModel)]="issue.reporter" [compareWith]="compareFn" nzPlaceHolder="Choose"
+                                nzAllowClear="false">
+                                <nz-option *ngFor="let option of assignableMembers" [nzValue]="option"
+                                    [nzLabel]="option.fullName">
+                                </nz-option>
+                            </nz-select>
+                        </div>
+                        <nz-radio-group name="priorityGrp" [(ngModel)]="issue.priority">
+                            <label nz-radio-button nz-tooltip nzTooltipTitle="Urgent" nzValue="Urgent"><img
+                                    src="/assets/img/priority-blocker.svg" /></label>
+                            <label nz-radio-button nz-tooltip nzTooltipTitle="High" nzValue="High"><img
+                                    src="/assets/img/priority-high.svg" /></label>
+                            <label nz-radio-button nz-tooltip nzTooltipTitle="Normal" nzValue="Normal"><img
+                                    src="/assets/img/priority-normal.svg" /></label>
+                            <label nz-radio-button nz-tooltip nzTooltipTitle="Low" nzValue="Low">
+                                <img src="/assets/img/priority-low.svg" /></label>
+                        </nz-radio-group>
+                    </div>
+                </div>
+                <div class="drawer-footer" style="text-align: left;line-height: 2rem;">
+                    <label nz-checkbox name="openAfterCreate" [(ngModel)]="openAfterCreate">Open issue after
+                        create</label>
+                    <!-- <label nz-checkbox name="closeAfterCreate" [(ngModel)]="closeAfterCreate">Close after create</label> -->
+                    <button nz-button nzType="primary" type="submit" [nzLoading]="isCreating" class="pull-right"
+                        *ngIf="!issue.id" nz-button>Create
+                        <app-icon height="18" width="18" icon="arrow-right-short"></app-icon>
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="dock-modal-footer" [class.hide]="isMinimized"></div>
+    </div>
+</div>

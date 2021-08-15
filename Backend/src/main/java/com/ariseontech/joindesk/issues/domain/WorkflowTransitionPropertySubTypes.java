@@ -1,0 +1,11 @@
+package com.ariseontech.joindesk.issues.domain;
+
+public enum WorkflowTransitionPropertySubTypes {
+    CONDITION_CURRENT_USER,
+    CONDITION_IS_IN_GROUP,
+    CONDITION_HAS_PERMISSION,
+    CONDITION_FIELD_REQUIRED,
+    CONDITION_CHECKLIST_COMPLETE,
+    POST_FUNCTION_ASSIGN_TO_USER,
+    POST_FUNCTION_UPDATE_FIELD
+}

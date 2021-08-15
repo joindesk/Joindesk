@@ -1,0 +1,88 @@
+<div class="container-fluid h-100 login-wrapper">
+    <div class="row align-items-center h-100">
+        <div class="col col-sm-2 col-md-2 col-xl-4 col-lg-3"></div>
+        <div class="col col-sm-8 col-md-8 col-xl-4 col-lg-6 login-box p-4">
+            <nz-spin [nzSpinning]="loading">
+                <img src="assets/img/jd_logo.png" height="45" alt="logo" data-src="assets/img/jd_logo.png">
+                <p style="font-weight: bold;font-size: 24px;margin-top: 2.5rem;">Setup</p>
+                <div class="alert alert-danger mt-4 text-center" *ngIf="!isBrowser"><b>This browser version is not
+                        supported
+                    </b><br> Please use any latest browsers
+                </div>
+                <div class="row" *ngIf="isBrowser">
+                    <div class="col-12">
+                        <p *ngIf="!showSetup" class="mt-2 mb-3 help"> Setup completed? <span nz-button nzType="link" routerLink="/login" class="p-0 help">Login</span>
+                        </p>
+                        <form nzLayout="vertical" nz-form [formGroup]="validateForm" (ngSubmit)="saveSetup()">
+                            <nz-form-item>
+                                <nz-form-label class="p-0">Admin Email</nz-form-label>
+                                <nz-form-control nzErrorTip="Email is required and to be valid">
+                                    <nz-input-group nzPrefixIcon="user">
+                                        <input type="email" nz-input formControlName="email" placeholder="Email Address" [(ngModel)]="model.email" />
+                                    </nz-input-group>
+                                </nz-form-control>
+                            </nz-form-item>
+                            <nz-form-item>
+                                <nz-form-label class="p-0">Admin password</nz-form-label>
+                                <nz-form-control nzErrorTip="Password is required with minimum 8 characters">
+                                    <nz-input-group nzPrefixIcon="lock">
+                                        <input type="password" nz-input formControlName="password" placeholder="Password" [(ngModel)]="model.password" minlength="8" />
+                                    </nz-input-group>
+                                </nz-form-control>
+                            </nz-form-item>
+                            <nz-form-item>
+                                <nz-form-label class="p-0">Base URL</nz-form-label>
+                                <nz-form-control nzErrorTip="URL is required">
+                                    <nz-input-group nzPrefixIcon="link">
+                                        <input type="url" nz-input formControlName="url" placeholder="https://joindeskapp.com" [(ngModel)]="model.url" />
+                                    </nz-input-group>
+                                </nz-form-control>
+                            </nz-form-item>
+                            <nz-form-item>
+                                <nz-form-label class="p-0">Timezone</nz-form-label>
+                                <nz-form-control nzErrorTip="Timezone is required">
+                                    <nz-input-group>
+                                        <nz-select style="width:100%" name="Timezone" nzPlaceHolder="Timezone" [(ngModel)]="model.timezone" formControlName="timezone" [(ngModel)]="model.timezone">
+                                            <nz-option *ngFor="let a of timezones" [nzLabel]="a" [nzValue]="a">
+                                            </nz-option>
+                                        </nz-select>
+                                    </nz-input-group>
+                                </nz-form-control>
+                            </nz-form-item>
+                            <div class="row">
+                                <div class="col p-0">
+                                    <nz-form-item>
+                                        <nz-form-label class="p-0">Start Time</nz-form-label>
+                                        <nz-form-control nzErrorTip="Start Time is required / invalid">
+                                            <nz-input-group nzPrefixIcon="clock-circle">
+                                                <input type="time" nz-input formControlName="startTime" [(ngModel)]="model.startTime" />
+                                            </nz-input-group>
+                                        </nz-form-control>
+                                    </nz-form-item>
+                                </div>
+                                <div class="col p-0">
+                                    <nz-form-item>
+                                        <nz-form-label class="p-0">End Time</nz-form-label>
+                                        <nz-form-control nzErrorTip="End Time is required / invalid">
+                                            <nz-input-group nzPrefixIcon="clock-circle">
+                                                <input type="time" nz-input formControlName="endTime" [(ngModel)]="model.endTime" />
+                                            </nz-input-group>
+                                        </nz-form-control>
+                                    </nz-form-item>
+                                </div>
+                            </div>
+                            <nz-form-item>
+                                <nz-form-control>
+                                    <button nz-button class="login-form-button" [nzType]="'primary'">Save</button>
+                                </nz-form-control>
+                            </nz-form-item>
+                        </form>
+                    </div>
+                </div>
+                <div class="mt-5">
+                    <p style="border-top: 1px solid #F6F6F6;" class="pt-3 help">Configuration can be updated later in admin area</p>
+                </div>
+            </nz-spin>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,231 @@
+<nz-page-header [nzGhost]="false" class="issueHeader">
+  <nz-page-header-title class="issueTitle">
+    Issues
+  </nz-page-header-title>
+  <nz-page-header-subtitle>
+    <a nz-dropdown class="selectFilter ml-1" [nzDropdownMenu]="filterMenu" *ngIf="filters">
+      <span *ngIf="!filterId || filterId <= 0">Select Filter</span>
+      <span *ngIf="filterId > 0">Filter: {{getFilter(filterId)}}</span>
+      <i class="ml-1" nz-icon nzType="down"></i>
+    </a>
+    <nz-dropdown-menu #filterMenu="nzDropdownMenu">
+      <ul nz-menu nzSelectable>
+        <li nz-menu-item *ngFor="let f of filters" (click)="setFilter(f.id)">{{f.name}}</li>
+        <li nz-menu-divider></li>
+        <li nz-menu-item (click)="showAllFiltersModal = true">All Filter</li>
+        <li nz-menu-item (click)="clearAllFilter()">Clear Filter</li>
+      </ul>
+    </nz-dropdown-menu>
+    <button nz-button nzType="default" nzSize="small" *ngIf="!loading && canSaveFilter()" (click)="editFilter()">save
+    </button>
+    <button nz-button nzType="default" nzSize="small" *ngIf="!loading && canEditFilter()" (click)="editFilter()">edit
+    </button>
+  </nz-page-header-subtitle>
+  <nz-page-header-extra class="issueTitleExtra" *ngIf="!loading">
+    <!-- <nz-button-group>
+      <button nz-button [nzType]="filter.filter.view == 'list' ? 'primary' : 'default'"
+        (click)="switchView('list')">List</button>
+      <button nz-button [nzType]="filter.filter.view == 'calendar' ? 'primary' : 'default'"
+        (click)="switchView('calendar')">Calendar</button>
+    </nz-button-group>
+    <nz-divider nzType="vertical"></nz-divider> -->
+    <button nz-button nzType="dashed" nz-dropdown nzTrigger="click" nzClickHide="false" nzBackdrop="false"
+      [nzDropdownMenu]="columnFilterMenu">
+      <app-icon height="18" width="18" icon="toggles"></app-icon>
+    </button>
+    <nz-dropdown-menu #columnFilterMenu="nzDropdownMenu">
+      <ul nz-menu>
+        <li nz-menu-item (click)="updateColumn('compact')">
+          <app-icon height="18" width="18" icon="check" [style.color]="customize.compact ? 'green':'lightgray'">
+          </app-icon> Compact
+        </li>
+        <li nz-menu-divider></li>
+        <li nz-menu-item *ngFor="let c of customize.columns" (click)="updateColumn(c)">
+          <app-icon height="18" width="18" icon="check" [style.color]="c.display ? 'green':'lightgray'">
+          </app-icon> {{c.label}}
+        </li>
+      </ul>
+    </nz-dropdown-menu>
+    <button *ngIf="data && data.total > 0" nz-button nzType="dashed" nz-dropdown nzTrigger="click" nzBackdrop="false"
+      [nzDropdownMenu]="downloadMenu">
+      <app-icon height="18" width="18" icon="download"></app-icon>
+    </button>
+    <!-- <button nz-button nzType="dashed"><i nz-icon nzType="ellipsis" nzTheme="outline"></i></button> -->
+    <nz-dropdown-menu #downloadMenu="nzDropdownMenu">
+      <ul nz-menu>
+        <li nz-menu-item (click)="export('excel')">
+          Excel
+        </li>
+        <li nz-menu-item (click)="export('csv')">
+          CSV
+        </li>
+      </ul>
+    </nz-dropdown-menu>
+  </nz-page-header-extra>
+</nz-page-header>
+<nz-skeleton *ngIf="!data" [nzLoading]="loading" [nzActive]="true" [nzParagraph]="{ rows: 10 }"></nz-skeleton>
+<ng-template #spinnerIndicatorTemplate><i nz-icon nzType="loading" style="font-size: 24px;"></i> </ng-template>
+<nz-spin [nzIndicator]="spinnerIndicatorTemplate" [nzSpinning]="loading">
+  <div nz-row class="p-2" *ngIf="filter">
+    <div nz-col nzSpan="24" style="line-height: 40px;">
+      <!-- <button nz-button nzType="dashed" class="filterBtn" (click)="openFilterDrawer()">
+        <i nz-icon nzType="filter" nzTheme="outline"></i>
+        Filter</button> -->
+      <span *ngFor="let r of filter.filter.query.rules; let ri = index">
+        <span class="filterRule" [attr.data-filterIndex]="ri" nz-popover nzPopoverTrigger="click"
+          nzPopoverPlacement="bottomLeft" [nzPopoverContent]="filterPopover">
+          {{config.fields[r.field].name}}
+          <span *ngIf="r.operator == 'CUSTOM' && r.valueFrom && !r.valueTo"> >
+            {{r.valueFrom | date}}</span>
+          <span *ngIf="r.operator == 'CUSTOM' && r.valueTo && r.valueFrom"> bw {{r.valueFrom | date}} ~
+            {{r.valueTo | date}} </span>
+          <span *ngIf="r.operator == 'CUSTOM' && r.valueTo && !r.valueFrom">
+            < {{r.valueTo | date}}</span> <span *ngIf="r.operator != 'CUSTOM'"> {{r.operator | lowercase }}
+              </span>
+              <span
+                *ngIf="(r.operator === 'IN' || r.operator === 'NOT IN') && r.expandedValues && r.expandedValues.length > 0">
+                <span *ngIf="r.expandedValues.length <= 2">
+                  ({{r.expandedValues}})
+                </span>
+                <span *ngIf="r.expandedValues.length > 2">
+                  ({{r.expandedValues.length}})
+                </span>
+              </span>
+              <span
+                *ngIf="(r.operator === 'IN' || r.operator === 'NOT IN') && (r.expandedValues && r.values.expandedValues == 0) && r.values && r.values.length > 0">
+                ({{r.values}})</span>
+              <app-icon (click)="removeFilterRule(ri)" class="cursorpointer ml-1" height="18" width="18" icon="x">
+              </app-icon>
+          </span>
+          <ng-template #filterPopover>
+            <div *ngIf="config.fields[r.field].type == 'multiselect'">
+              <div class="btn-block btn-group mb-3" role="group">
+                <button type="button" class="btn btn-default operatorSel" (click)="r.operator = 'IN'"
+                  [class.active]="r.operator == 'IN'">Any of</button>
+                <button type="button" class="btn btn-default operatorSel" (click)="r.operator = 'NOT IN'"
+                  [class.active]="r.operator == 'NOT IN'">None of</button>
+              </div>
+              <br>
+              <nz-select nzPlaceHolder="Choose" nzMode="multiple" class="qFilterSel" [(ngModel)]="r.values"
+                (ngModelChange)="filterChangeEvent()">
+                <nz-option *ngFor="let o of config.fields[r.field].options" [nzValue]="o.value" [nzLabel]="o.name">
+                </nz-option>
+              </nz-select>
+            </div>
+            <div *ngIf="config.fields[r.field].type == 'date'">
+              <nz-form-item style="margin-bottom: 0;">
+                <nz-form-control>
+                  <nz-select nzBorderless id="dateOptr" name="dateOptr" class="qFilterSelOptr" [(ngModel)]="r.operator"
+                    (ngModelChange)="filterChangeEvent()">
+                    <nz-option *ngFor="let value of config.fields[r.field].operators" [nzValue]="value"
+                      [nzLabel]="value">
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+              <nz-form-item style="margin-bottom: 0;" *ngIf="r.operator === 'CUSTOM'">
+                <nz-form-label>From</nz-form-label>
+                <nz-form-control>
+                  <nz-date-picker nzPlaceHolder="From" [(ngModel)]="r.valueFrom">
+                  </nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+              <nz-form-item style="margin-bottom: 0;" *ngIf="r.operator === 'CUSTOM'">
+                <nz-form-label>To</nz-form-label>
+                <nz-form-control>
+                  <nz-date-picker nzPlaceHolder="To" [(ngModel)]="r.valueTo">
+                  </nz-date-picker>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </ng-template>
+        </span>
+        <button nz-button nz-popover nzPopoverTrigger="hover" nzPopoverPlacement="bottomLeft" nzType="default"
+          [nzPopoverContent]="filterPopoverContent">
+          + Add filter
+        </button>
+        <ng-template #filterPopoverContent>
+          <div nz-row style="max-width: 400px;">
+            <div nz-col nzSpan="12" *ngFor="let f of config.fields | keyvalue">
+              <a nz-button nzType="default" (click)="addFilterRule(f.key, f.value)">{{f.value.name}}</a>
+            </div>
+          </div>
+        </ng-template>
+        <input type="text" placeholder="Search" nz-input style="width: 10rem;display: inline;"
+          [(ngModel)]="filter.filter.searchQuery" name="searchInpt" id="searchInpt" (keydown.enter)="executeSearch()">
+        <span *ngIf="!loading && isFilterModified()" nz-tooltip nzTooltipTitle="Filter changed but not searched"
+          nzTooltipPlacement="top">
+          <app-icon class="filterChangedExcIcon cursorpointer ml-1" height="18" width="18" icon="exclamation-triangle">
+          </app-icon>
+        </span>
+        <button
+          *ngIf="!loading && filter && filter.filter && isFilterModified() && (filter.filter.searchQuery.length > 0 || filter.filter.query.rules.length > 0)"
+          nz-button class="ml-2" nzType="primary" (click)="executeFilter()"> Search </button>
+        <span *ngIf="!loading && filter && filter.filter && filter.filter.query.rules.length > 0"
+          class="p-2 m-1 cursorpointer" (click)="clearAllFilter()" nzTooltipTitle="Clear All" nz-tooltip
+          style="color: #888888;">Clear filters
+        </span>
+    </div>
+  </div>
+</nz-spin>
+<app-issue-list [(data)]="data" [(filter)]="filter" [(customize)]="customize" [pageSizeOptions]="pageSizeOptions"
+  [(loading)]="loading" (searchEvent)="searchQuery()" (customizeEvent)="customizeEvent($event)"
+  (sortEvent)="searchQuery()" (paginateEvent)="paginate($event)" (pageSizeChangeEvent)="pageSizeChange($event)"
+  (openIssueEvent)="openIssue($event)">
+</app-issue-list>
+<!-- <app-issue-calendar *ngIf="!loading && filter && filter.filter.view == 'calendar'" [(data)]="data" [(filter)]="filter">
+</app-issue-calendar> -->
+<nz-modal [(nzVisible)]="showFilterSaveModal" nzTitle="Save Filter" (nzOnCancel)="showFilterSaveModal = false"
+  (nzOnOk)="saveFilter()">
+  <nz-radio-group class="mb-3" [(ngModel)]="filterSaveModel.type">
+    <label nz-radio nzValue="new">New</label>
+    <label nz-radio nzValue="overwrite">Overwrite existing</label>
+  </nz-radio-group>
+  <input style="min-width: 200px;" minlength="2" maxlength="50" *ngIf="filterSaveModel.type == 'new'" nz-input
+    placeholder="Filter Name" [(ngModel)]="filterSaveModel.name" />
+  <nz-select style="min-width: 200px;" *ngIf="filterSaveModel.type == 'overwrite'" nzShowSearch
+    nzPlaceHolder="Select existing filter" [(ngModel)]="filterSaveModel.filter">
+    <nz-option *ngFor="let f of filters" [nzDisabled]="f.readonly" [nzLabel]="f.name" [nzValue]="f"></nz-option>
+  </nz-select>
+  <nz-switch class="mt-2" *ngIf="filterSaveModel.type == 'new'" id="open" name="open" [(ngModel)]="filterSaveModel.open"
+    nzCheckedChildren="Project" nzUnCheckedChildren="Private">
+  </nz-switch>
+  {{filterSaveModel.open ? 'Open to all project members' : 'Only to me'}}
+</nz-modal>
+<nz-modal [(nzVisible)]="showFilterEditModal"
+  [nzTitle]="filter && filter.filter && filter.filter.id && filter.filter.id > 0 ? 'Edit Filter' : 'Create Filter'"
+  (nzOnCancel)="showFilterEditModal = false" (nzOnOk)="saveEditFilter()">
+  <input style="min-width: 200px;" nz-input placeholder="Filter Name" [(ngModel)]="filterSaveModel.name" />
+  <nz-switch class="mt-2" id="open" name="open" [(ngModel)]="filterSaveModel.open" nzCheckedChildren="Project"
+    nzUnCheckedChildren="Private">
+  </nz-switch>
+  {{filterSaveModel.open ? 'Open to all project members' : 'Only to me'}}
+</nz-modal>
+<nz-modal [(nzVisible)]="showAllFiltersModal" nzTitle="Filters" nzClassName="modal-no-footer"
+  (nzOnCancel)="showAllFiltersModal = false">
+  <nz-table #allFiltersTable [nzData]="filters">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Visiblity</th>
+        <th>Owner</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of allFiltersTable.data">
+        <td>{{ data.name }}</td>
+        <td>{{data.open ? 'Project' : 'Private'}}</td>
+        <td>{{data.owner.fullName}}</td>
+        <td>
+          <button nz-button nzType="primary" nzSize="small"
+            (click)="setFilter(data.id); showAllFiltersModal = false">apply</button>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+  <div *nzModalFooter></div>
+</nz-modal>
+<ng-template #updatedNotificationTemplate>
+  Result has been updated. <a nz-button nzType="link" (click)="searchQuery()">Reload</a>
+</ng-template>

@@ -1,0 +1,54 @@
+<div class="card" *ngIf="issue">
+  <div class="card-header">
+    <div class="card-title">
+      <a routerLink="/issue/{{issue.project.key}}-{{issue.key}}"> {{issue.project.key}}-{{issue.key}}</a>
+    </div>
+    <a routerLink="../">
+      <app-icon height="20" width="20" icon="x"> </app-icon>
+    </a>
+  </div>
+  <div class="card-body">
+    <h5>{{issue.summary}}</h5>
+    <p class="hint-text all-caps font-montserrat small m-t-20">Status</p>
+    <span class="p-t-5 m-l-5 p-b-5"
+      [className]="issue.currentStep.issueStatus.issueLifeCycle">{{issue.currentStep.issueStatus.name}}</span>
+    <p class="hint-text all-caps font-montserrat small m-t-20 m-b-0">Details</p>
+    <div class="row">
+      <div class="col-6 pull-left hint-text">Type:</div>
+      <div class="col-6 pull-right">{{issue.issueType.name}}</div>
+    </div>
+    <div class="row">
+      <div class="col-6 pull-left hint-text">Priority:</div>
+      <div class="col-6 pull-right">{{issue.priority}}</div>
+    </div>
+    <div class="row" *ngIf="issue.resolution">
+      <div class="col-6 pull-left hint-text">Resolution:</div>
+      <div class="col-6 pull-right issueResolution">
+        <app-icon height="18" width="18" icon="check"></app-icon> {{issue.resolution.name}}
+      </div>
+    </div>
+    <p class="hint-text all-caps font-montserrat small m-t-20 m-b-0">People</p>
+    <div class="row">
+      <div class="col-6 pull-left hint-text">Assignee:</div>
+      <div class="col-6 pull-right">{{issue.assignee ? issue.assignee.fullName : 'unassigned'}}</div>
+    </div>
+    <div class="row">
+      <div class="col-6 pull-left hint-text">Reporter:</div>
+      <div class="col-6 pull-right">{{issue.reporter.fullName}}</div>
+    </div>
+    <p class="hint-text all-caps font-montserrat small m-t-20 m-b-0">Dates</p>
+    <div class="row">
+      <div class="col-6 pull-left hint-text">Created:</div>
+      <div class="col-6 pull-right" nz-tooltip nzTooltipPlacement="topLeft"
+        nzTooltipTitle="{{issue.created | date:'medium'}}">{{issue.created| timeAgo}}</div>
+    </div>
+    <div class="row" *ngIf="issue.updated">
+      <div class="col-6 pull-left hint-text">Updated:</div>
+      <div class="col-6 pull-right" nz-tooltip nzTooltipPlacement="topLeft"
+        nzTooltipTitle="{{issue.updated | date:'medium'}}">
+        {{issue.updated| timeAgo}}</div>
+    </div>
+    <p class="hint-text all-caps font-montserrat small m-t-20 m-b-0">Attachments</p>
+    <p class="hint-text all-caps font-montserrat small m-t-20 m-b-0">Comments</p>
+  </div>
+</div>

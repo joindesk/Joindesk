@@ -1,0 +1,37 @@
+<form class="form-horizontal" *ngIf="project" #form="ngForm" (submit)="updateProject()" ngNativeValidate>
+  <div class="form-group row">
+    <label for="projectName" class="col-md-3 control-label">Name</label>
+    <div class="col-md-9">
+      <input type="text" class="form-control" id="projectName" placeholder="Name" [(ngModel)]="project.name" name="name"
+        required="" aria-required="true">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="projectDesc" class="col-md-3 control-label">Description</label>
+    <div class="col-md-9">
+      <textarea name="projectDesc" class="form-control" id="" cols="30" rows="10" [(ngModel)]="project.description"
+        required="" aria-required="true"></textarea>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label class="col-md-3 control-label">Active</label>
+    <div class="col-md-9">
+      <div class="">
+        <app-icon height="18" width="18" icon="{{project.active ? 'check':'x'"></app-icon>
+      </div>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label class="col-md-3 control-label">Lead</label>
+    <div class="col-md-9">
+      <div *ngIf="project.lead">{{project.lead.fullName}}</div>
+    </div>
+  </div>
+  <br />
+  <div class=" form-group row">
+          <label class="col-md-3 control-label"></label>
+          <div class="col-md-9">
+            <button nz-button nzType="primary" [disabled]="!form.dirty" type="submit">SAVE</button>
+          </div>
+      </div>
+</form>

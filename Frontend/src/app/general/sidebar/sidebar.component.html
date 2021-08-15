@@ -1,0 +1,108 @@
+<nav *ngIf="!dashboardService.homeView" class="page-sidebar" data-pages="sidebar"
+  style="transform: translate3d(0px, 0px, 0px);">
+
+  <div class="sidebar-header no-shadow">
+    <!--do not remove-->
+  </div>
+  <div class="sidebar-menu">
+    <div class="menu-items" style="position: relative;padding-top: 20px;">
+      <ul class="menu-items" style="height: auto; margin-bottom: 0px; margin-right: 0px; max-height: 503px;"
+        *ngIf="this.dashboardService.currentProject && !dashboardService.homeView">
+        <li routerLinkActive="active" [ngClass]="{'active': issuesActive.isActive }" nz-tooltip nzTooltipTitle="Issues"
+          nzTooltipPlacement="right" [routerLinkActiveOptions]="{exact: true}">
+          <a [routerLink]='["/project",dashboardService.currentProject.key]'>
+            <span class="title">Issues</span>
+          </a>
+          <a routerLink="/issue/" routerLinkActive #issuesActive="routerLinkActive" style="display: none"></a>
+          <span class="icon-thumbnail cursorpointer" [routerLink]='["/project",dashboardService.currentProject.key]'>
+            <app-icon height="20" width="20" icon="ui-checks"> </app-icon>
+          </span>
+        </li>
+        <li routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" nz-tooltip nzTooltipTitle="Calendar"
+          nzTooltipPlacement="right">
+          <a [routerLink]='["/project",dashboardService.currentProject.key,"calendar"]'>
+            <span class="title">Calendar</span>
+          </a>
+          <span class="icon-thumbnail cursorpointer"
+            [routerLink]='["/project",dashboardService.currentProject.key,"calendar"]'>
+            <app-icon height="20" width="20" icon="calendar2-week-fill"> </app-icon>
+          </span>
+        </li>
+        <li routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" nz-tooltip nzTooltipTitle="Gantt"
+          nzTooltipPlacement="right">
+          <a [routerLink]='["/project",dashboardService.currentProject.key,"gantt"]'>
+            <span class="title">gantt</span>
+          </a>
+          <span class="icon-thumbnail cursorpointer"
+            [routerLink]='["/project",dashboardService.currentProject.key,"gantt"]'>
+            <img src="/assets/img/gantt_icon.svg" height="20" width="20" alt="">
+          </span>
+        </li>
+        <li routerLinkActive="active" [ngClass]="{'active': boardActive.isActive }"
+          [routerLinkActiveOptions]="{exact: true}" nz-tooltip nzTooltipTitle="Board" nzTooltipPlacement="right">
+          <a *ngIf="dashboardService.currentBoard"
+            [routerLink]='["/project",dashboardService.currentProject.key,"board",dashboardService.currentBoard]'>
+            <span class="title">Board</span>
+          </a>
+          <a *ngIf="!dashboardService.currentBoard"
+            [routerLink]='["/project",dashboardService.currentProject.key,"board"]'>
+            <span class="title">Board</span>
+          </a>
+          <a [routerLink]='["/project",dashboardService.currentProject.key,"board"]' routerLinkActive
+            #boardActive="routerLinkActive" style="display: none"></a>
+          <span class="icon-thumbnail cursorpointer" *ngIf="!dashboardService.currentBoard"
+            [routerLink]='["/project",dashboardService.currentProject.key,"board"]'>
+            <app-icon height="20" width="20" icon="kanban"> </app-icon>
+          </span>
+          <span class="icon-thumbnail cursorpointer" *ngIf="dashboardService.currentBoard"
+            [routerLink]='["/project",dashboardService.currentProject.key,"board",dashboardService.currentBoard]'>
+            <app-icon height="20" width="20" icon="kanban"> </app-icon>
+          </span>
+        </li>
+        <li routerLinkActive="active" [ngClass]="{'active': wikiActive.isActive }" nz-tooltip nzTooltipTitle="Pages"
+          nzTooltipPlacement="right">
+          <a [routerLink]='["/project",dashboardService.currentProject.key,"page"]'>
+            <span class="title">Pages</span>
+          </a>
+          <a [routerLink]='["/project",dashboardService.currentProject.key,"page"]' routerLinkActive
+            #wikiActive="routerLinkActive" style="display: none"></a>
+          <span class="icon-thumbnail cursorpointer"
+            [routerLink]='["/project",dashboardService.currentProject.key,"page"]'>
+            <app-icon height="20" width="20" icon="journals"> </app-icon>
+          </span>
+        </li>
+        <li routerLinkActive="active" nz-tooltip nzTooltipTitle="Release" nzTooltipPlacement="right"
+          *ngIf="this.dashboardService.currentProject && this.dashboardService.currentProject.editable">
+          <a [routerLink]='["/project",dashboardService.currentProject.key,"release"]'>
+            <span class="title">Release</span>
+          </a>
+          <span class="icon-thumbnail cursorpointer"
+            [routerLink]='["/project",dashboardService.currentProject.key,"release"]'>
+            <app-icon height="20" width="20" icon="collection"> </app-icon>
+          </span>
+        </li>
+        <li routerLinkActive="active" nz-tooltip nzTooltipTitle="Manage" nzTooltipPlacement="right"
+          *ngIf="this.dashboardService.currentProject && this.dashboardService.currentProject.editable">
+          <a [routerLink]='["/project",dashboardService.currentProject.key,"manage"]'>
+            <span class="title">Manage</span>
+          </a>
+          <span class="icon-thumbnail cursorpointer"
+            [routerLink]='["/project",dashboardService.currentProject.key,"manage"]'>
+            <app-icon height="20" width="20" icon="sliders"> </app-icon>
+          </span>
+        </li>
+        <li routerLinkActive="active" nz-tooltip nzTooltipTitle="Reports" nzTooltipPlacement="right">
+          <a [routerLink]='["/project",dashboardService.currentProject.key,"reports"]'>
+            <span class="title">Reports</span>
+          </a>
+          <span class="icon-thumbnail cursorpointer"
+            [routerLink]='["/project",dashboardService.currentProject.key,"reports"]'>
+            <app-icon height="20" width="20" icon="graph-up"> </app-icon>
+          </span>
+        </li>
+      </ul>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+
+</nav>

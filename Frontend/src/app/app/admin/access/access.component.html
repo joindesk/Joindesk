@@ -1,0 +1,102 @@
+<nz-page-header [nzGhost]="false" nzTitle="IP Filtering">
+  <nz-page-header-extra>
+    <button nz-button nzType="primary" (click)="create()">Create</button>
+  </nz-page-header-extra>
+</nz-page-header>
+<div class="m-0 mt-4 row">
+  <div class="col-12">
+    <nz-table class="issueTable" *ngIf="rules" #rulesTable [nzData]="rules" nzPageSize="999999"
+      [nzNoResult]="createDocTemp" nzShowPagination="false">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th class="text-center">Enabled</th>
+          <th class="text-center">API Only</th>
+          <th>Type</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of rulesTable.data">
+          <td class="v-align-middle semi-bold">
+            {{r.cidr}}
+          </td>
+          <td class="v-align-middle semi-bold">
+            {{r.description}}
+          </td>
+          <td class="text-center semi-bold">
+            <app-icon height="18" width="18" icon="{{r.enabled ? 'check-circle' : 'times-circle'}}"> </app-icon>
+          </td>
+          <td class="text-center semi-bold">
+            <app-icon height="18" width="18" icon="{{r.apiOnly ? 'check-circle' : 'times-circle'}}"> </app-icon>
+          </td>
+          <td class="v-align-middle semi-bold">
+            {{r.whiteList ? 'White Listed' : 'Black Listed'}}
+          </td>
+          <td>
+            <a (click)="open(r)" class="btn btn-default btn-xs pull-right">
+              <app-icon height="18" width="18" icon="pencil"> </app-icon>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+      <ng-template #createDocTemp>
+        <img src="/assets/img/empty.svg" class="jdempty" width="200">
+      </ng-template>
+    </nz-table>
+  </div>
+</div>
+<nz-drawer *ngIf="rule" [nzMaskClosable]="false" [nzClosable]="true" nzWidth="30vw" [nzVisible]="rule != undefined"
+  nzPlacement="right" (nzOnClose)="cancel()">
+  <div class="alert alert-warning mt-5 m-b-10">CAUTION: You might lock yourself out</div>
+  <form (ngSubmit)="save(enabled,apiOnly,whiteList)" #issueTypeForm="ngForm" ngNativeValidate>
+    <div class="row">
+      <div class="col-12">
+        <div class="form-group">
+          <label>CIDR</label>
+          <input type="text" class="form-control" required name="cidr" placeholder="10.0.0.0/24"
+            [(ngModel)]="rule.cidr">
+          <div class="help-block text-info">
+            <app-icon height="18" width="18" icon="question-circle"> </app-icon>
+            <a href="https://www.ipaddressguide.com/cidr" target="_blank"> How to calculate CIDR ?</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" class="form-control" required name="description" placeholder="East server range"
+            [(ngModel)]="rule.description">
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input" name="enabledCheck" id="enabledCheck" #enabled
+            [checked]="rule.enabled" />
+          <label class="form-check-label" for="enabledCheck">Enabled ?</label>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input" name="apiOnlyCheck" id="apiOnlyCheck" #apiOnly
+            [checked]="rule.apiOnly" />
+          <label class="form-check-label" for="apiOnlyCheck">Api Only ?</label>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input" name="whiteBlackCheck" id="whiteBlackCheck" #whiteList
+            [checked]="rule.whiteList">
+          <label class="form-check-label" for="whiteBlackCheck">Check to whitelist</label>
+        </div>
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <button type="submit" class="ml-1" nz-button nzType="primary" *ngIf="!rule.id">Create</button>
+      <button type="submit" class="ml-1" nz-button nzType="primary" *ngIf="rule.id">Update</button>
+      <button type="button" class="ml-1" nz-button nzType="danger" (click)="delete()" *ngIf="rule.id">Delete</button>
+      <button type="button" (click)="cancel()" class="ml-1" nz-button nzType="default">Cancel</button>
+    </div>
+  </form>
+</nz-drawer>

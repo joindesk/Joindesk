@@ -1,0 +1,17 @@
+<!-- <span _ngcontent-c3="" class="thumbnail-wrapper inline {{s}}">
+  <img *ngIf="pic && pic !== 'unassigned'" [src]="baseURL + '/media/' + pic" title="{{tooltip}}">
+  <img *ngIf="pic && pic === 'unassigned'" [src]="baseURL + '/media/unassigned.png'" title="{{tooltip}}">
+  <img *ngIf="!pic" [src]="baseURL + '/media/default.jpg'" title="{{tooltip}}">
+</span> -->
+<span *ngIf="!pic" [ngStyle]="{ 'background-color': bgColor, 'color': color }"
+  class="ant-avatar ant-avatar-circle {{s}}" style="vertical-align: middle;">
+  <span class="ant-avatar-string ng-star-inserted"
+    style="transform: scale(1) translateX(-50%);">{{getInitials(tooltip)}}</span>
+</span>
+<span *ngIf="pic && pic === 'unassigned'" [ngStyle]="{ 'background-color': 'lightgray', 'color': 'black' }"
+  class="ant-avatar ant-avatar-circle {{s}}" style="vertical-align: middle;">
+  <span class="ant-avatar-string ng-star-inserted" style="transform: scale(1) translateX(-50%);">?</span>
+</span>
+<span *ngIf="pic && pic !== 'unassigned'" class="ant-avatar ant-avatar-circle ant-avatar-icon ant-avatar-image {{s}}">
+  <img [src]="baseURL + '/media/' + pic" title="{{tooltip}}">
+</span>

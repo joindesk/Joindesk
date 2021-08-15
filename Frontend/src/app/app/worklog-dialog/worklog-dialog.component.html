@@ -1,0 +1,60 @@
+<div class="card m-0">
+  <div class="card-header">
+    <div class="card-title">Work log</div>
+  </div>
+  <div class="card-body pt-0 pb-0" *ngIf="workLog">
+    <form class="pl-2" nz-form (ngSubmit)="save()" ngNativeValidate *ngIf="workLog">
+      <nz-form-item class="m-0">
+        <nz-form-label>Duration</nz-form-label>
+        <nz-form-control>
+          <input name="workMinutes" [(ngModel)]="workLog.work" required nz-input placeholder="eg. 2w 3d 4h 30m" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="m-0">
+        <nz-form-label>Ticket</nz-form-label>
+        <nz-form-control>
+          <input nz-input name="workFrom" [ngModel]="workLog.workFrom | date:'yyyy-MM-ddTHH:mm'"
+            (ngModelChange)="workLog.workFrom = $event" placeholder="Date started" type="datetime-local" required>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="m-0">
+        <nz-form-label>Description of work</nz-form-label>
+        <nz-form-control>
+          <textarea rows="4" name="workDescription" required nz-input [(ngModel)]="workLog.workDescription"
+            placeholder="Brief about the work done" maxlength="250"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="text-right mt-2">
+        <nz-form-control>
+          <button nz-button nzType="primary">Add</button>
+          <button type="button" nz-button nzType="default" (click)="close()">Cancel</button>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+    <form class="hide" (ngSubmit)="save()" ngNativeValidate>
+      <nz-form-item>
+        <nz-form-control>
+          <nz-form-label>Work Duration</nz-form-label>
+          <input nz-input name="workMinutes" [(ngModel)]="workLog.work" placeholder="Work Duration (eg. 2w 3d 4h 30m)"
+            type="text" required>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-control>
+          <nz-form-label>Work From</nz-form-label>
+          <input nz-input name="workFrom" [ngModel]="workLog.workFrom | date:'yyyy-MM-ddTHH:mm'"
+            (ngModelChange)="workLog.workFrom = $event" placeholder="Date started" type="datetime-local" required>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-control>
+          <nz-form-label>Description</nz-form-label>
+          <textarea nz-input name="workDescription" [(ngModel)]="workLog.workDescription" placeholder="Leave a comment"
+            maxlength="250"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+      <button type="submit" nz-button nzType="primary">Log</button>
+      <button type="button" nz-button nzType="default" (click)="close()">Cancel</button>
+    </form>
+  </div>
+</div>

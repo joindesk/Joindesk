@@ -1,0 +1,46 @@
+<nz-page-header class="adminAreaHeader" nzTitle="Project">
+  <nz-page-header-extra>
+    <button nz-button (click)="open(0, 'new project')">Create</button>
+  </nz-page-header-extra>
+</nz-page-header>
+<div class="card card-transparent">
+  <div class="m-0 row card-body">
+    <div class="col-12">
+      <table class="table table-hover" role="grid">
+        <thead>
+          <tr role="row">
+            <th>Name</th>
+            <th>Description</th>
+            <th>Key</th>
+            <th width="40%"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr role="row" *ngFor="let p of projectService.projects">
+            <td class="v-align-middle semi-bold">
+              {{p.name}}
+            </td>
+            <td class="v-align-middle">{{p.description}}
+            </td>
+            <td class="v-align-middle">{{p.key}}
+            </td>
+            <td>
+              <a [routerLink]="['/project',p.key,'manage','issue-type']" nz-button nzSize="small" nzType="primary">Issue
+                Type</a>
+              <a [routerLink]="['/project',p.key,'manage','group']" nz-button nzSize="small" nzType="primary"
+                style="margin-left: 5px;">Groups</a>
+              <a [routerLink]="['/project',p.key,'manage','workflow']" nz-button nzSize="small" nzType="primary"
+                style="margin-left: 5px;">Workflow</a>
+              <!-- <a [routerLink]="[p.id]" routerLinkActive="active" class="btn btn-default btn-xs pull-right">
+                <app-icon height="18" width="18" icon="arrow-right-short"> </app-icon>
+              </a> -->
+              <a (click)="open(p.id, p.name)" class="btn btn-default btn-xs pull-right">
+                <app-icon height="18" width="18" icon="eye"> </app-icon>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,46 @@
+<nz-card>
+  <h3>Manage</h3>
+  <div class="row">
+    <div class="col-2">
+      <ul class="nav nav-tabs nav-tabs-simple nav-tabs-left bg-white"
+        style="width: 100%;border-right: 1px solid #8080802e;">
+        <li class="nav-item text-right">
+          <a routerLinkActive="active linkActive" [routerLinkActiveOptions]="{exact: true}"
+            [routerLink]="['/project',projectKey,'manage']">Overview</a>
+        </li>
+        <li class="nav-item text-right">
+          <a routerLinkActive="active linkActive" [routerLinkActiveOptions]="{exact: true}"
+            [routerLink]="['/project',projectKey,'manage','issue-type']">Issue Type
+          </a>
+        </li>
+        <li class="nav-item text-right">
+          <a routerLinkActive="active linkActive" [routerLinkActiveOptions]="{exact: false}"
+            [routerLink]="['/project',projectKey,'manage','workflow']">Workflow</a>
+        </li>
+        <li class="nav-item text-right">
+          <a routerLinkActive="active linkActive" [routerLinkActiveOptions]="{exact: true}"
+            [routerLink]="['/project',projectKey,'manage','group']">Group</a>
+        </li>
+        <li class="nav-item text-right">
+          <a routerLinkActive="active linkActive" [routerLinkActiveOptions]="{exact: true}"
+            [routerLink]="['/project',projectKey,'manage','component']">Component</a>
+        </li>
+        <li class="nav-item text-right">
+          <a routerLinkActive="active linkActive" [routerLinkActiveOptions]="{exact: true}"
+            [routerLink]="['/project',projectKey,'manage','repository']">Repository</a>
+        </li>
+        <li class="nav-item text-right">
+          <a routerLinkActive="active linkActive" [routerLinkActiveOptions]="{exact: true}"
+            [routerLink]="['/project',projectKey,'manage','custom-field']">Custom Fields</a>
+        </li>
+        <li class="nav-item text-right">
+          <a routerLinkActive="active linkActive" [routerLinkActiveOptions]="{exact: true}"
+            [routerLink]="['/project',projectKey,'manage','timetracking']">Time tracking</a>
+        </li>
+      </ul>
+    </div>
+    <div class="col-10">
+      <router-outlet #o="outlet"></router-outlet>
+    </div>
+  </div>
+</nz-card>

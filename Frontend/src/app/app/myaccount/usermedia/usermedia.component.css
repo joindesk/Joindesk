@@ -1,0 +1,17 @@
+.thumbnail-wrapper.d72 {
+    width: 72px;
+    height: 72px;
+}
+
+.thumbnail-wrapper.d72>* {
+    line-height: 50px;
+}
+
+.thumbnail-wrapper.d100 {
+    width: 100px;
+    height: 100px;
+}
+
+.thumbnail-wrapper.d100>* {
+    line-height: 50px;
+}

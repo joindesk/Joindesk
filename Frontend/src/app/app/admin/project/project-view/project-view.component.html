@@ -1,0 +1,78 @@
+<div class="card" *ngIf="project">
+  <div class="card-body">
+    <div class="row m-b-20" *ngIf="!project.edit">
+      <div class="col-12">
+        <p>{{project.description}}</p>
+        <p>
+          <b>Key: </b>{{project.key}}
+        </p>
+        <p>
+          <b>Active: </b>{{project.active ? "True" : "False"}}
+        </p>
+        <p>
+          <b>API: </b>{{project.apiEnabled ? "Enabled" : "disabled"}}
+        </p>
+        <p>
+          <b>Lead: </b>{{project.lead ? project.lead.fullName : ''}}
+        </p>
+        <p>
+          <b>Slack Channel: </b>{{project.slackChannel ? project.slackChannel.name : ''}}
+        </p>
+        <p>
+          <b>Slack Notification: </b>{{project.notifyViaSlack ? "Enabled" : "disabled"}}
+        </p>
+      </div>
+    </div>
+    <button class="btn btn-primary" *ngIf="!project.edit" (click)="project.edit=true">Edit</button>
+    <form (ngSubmit)="save()" #projectForm="ngForm" ngNativeValidate *ngIf="project.edit">
+      <div class="form-group">
+        <label for="exampleInputPassword1">Name</label>
+        <input type="text" class="form-control" required name="projectName" placeholder="Name"
+          [(ngModel)]="project.name" maxlength="100">
+      </div>
+      <div class="form-group">
+        <label for="exampleInputPassword1">Description</label>
+        <input type="text" class="form-control" required name="projectDesc" placeholder="Description"
+          [(ngModel)]="project.description" maxlength="200">
+      </div>
+      <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" name="projActive" id="projActive" [(ngModel)]="project.active">
+        <label class="form-check-label" for="projActive">Active ?</label>
+      </div>
+      <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" name="apiEnabled" id="apiEnabled"
+          [(ngModel)]="project.apiEnabled">
+        <label class="form-check-label" for="apiEnabled">API Enabled ?</label>
+      </div>
+      <div class="form-group" *ngIf="!project.id">
+        <label for="exampleInputPassword1">Key</label>
+        <input type="text" class="form-control" required name="projectKey" minlength="2" maxlength="10"
+          placeholder="Key" [(ngModel)]="project.key" pattern="[A-Z0-9]{2,10}">
+        <small class="form-text text-muted">Upper case characters and numbers between 2 to 10 characters (Like
+          ASDF)</small>
+      </div>
+      <div class="form-group">
+        <label for="leadLabel">Lead</label>
+        <nz-select name="projectLead" nzPlaceHolder="choose a project lead" [(ngModel)]="project.lead"
+          [compareWith]="compareFn">
+          <nz-option *ngFor="let a of userService.users" [nzLabel]="a.fullName" [nzValue]="a"></nz-option>
+        </nz-select>
+      </div>
+      <!-- <div class="form-group" *ngIf="project.id && slackEnabled">
+        <label for="slackC">Slack Channel</label>
+        <mat-select placeholder="choose a slack channel" name="slackC" [(ngModel)]="project.slackChannel"
+          aria-required="true" required [compareWith]="compareFn">
+          <mat-option *ngFor="let channel of channels" [value]="channel">{{channel.name}}</mat-option>
+        </mat-select>
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input" name="notifyViaSlack" id="notifyViaSlack"
+            [(ngModel)]="project.notifyViaSlack">
+          <label class="form-check-label" for="notifyViaSlack">Slack Notification Enabled ?</label>
+        </div>
+      </div> -->
+      <button type="submit" class="btn btn-primary" *ngIf="!project.id">Create</button>
+      <button type="submit" class="btn btn-primary" *ngIf="project.id">Update</button>
+      <button type="button" (click)="cancel()" class="btn btn-default">Cancel</button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,180 @@
+<div class="content">
+  <div class="inner-content full-height m-2">
+    <div class="grid-container" *ngIf="!loading && overview && overview.length > 0">
+      <div class="Project-Overview">
+        <div class="card m-0">
+          <nz-card class="homePageCard" nzTitle="Projects">
+            <div class="pb-2 pt-2 ng-star-inserted cursorpointer homePageProjectCard" *ngFor="let p of overview"
+              [routerLink]='["/project",p.key]'>
+              <div class="d-flex">
+                <div class="flex-1 full-width overflow-ellipsis">
+                  <!-- <p class="hint-text all-caps no-margin overflow-ellipsis ">{{p.key}}</p> -->
+                  <h4 class="no-margin overflow-ellipsis ">{{p.name}}</h4>
+                </div>
+              </div>
+              <nz-row [nzGutter]="16" class="mt-3 mb-3">
+                <nz-col [nzSpan]="12">
+                  <nz-statistic [nzValue]="p.OPEN | number" [nzTitle]="'OPEN'"></nz-statistic>
+                </nz-col>
+                <nz-col [nzSpan]="12">
+                  <nz-statistic [nzValue]="p.COMPLETED | number" [nzTitle]="'COMPLETED'"></nz-statistic>
+                </nz-col>
+              </nz-row>
+              <!-- <div class="row text-center mt-3">
+              <div class="col-6">
+                <h5 class="m-0">{{p.OPEN}}</h5>
+                <p class="hint-text">OPEN</p>
+              </div>
+              <div class="col-6">
+                <h5 class="m-0">{{p.COMPLETED}}</h5>
+                <p class="hint-text">COMPLETED</p>
+              </div>
+            </div> -->
+              <!-- <div class="mt-1">
+              <p class="hint-text small pull-right no-margin">{{getPercentage(p.report)}}% resolved</p>
+              <div class="clearfix"></div>
+            </div> -->
+              <div class="progress progress-small m-b-15 m-t-10">
+                <div class="progress-bar progress-bar-info" [style.width.%]="getPercentage(p)"></div>
+              </div>
+            </div>
+          </nz-card>
+        </div>
+      </div>
+      <div class="Assigned-To-me">
+        <div class="card m-0">
+          <nz-card class="homePageCard" nzTitle="Assigned to me" [nzExtra]="toMeExtra">
+            <nz-skeleton [nzLoading]="loadingAssignedToMe" [nzActive]="true" [nzParagraph]="{ rows: 4 }"></nz-skeleton>
+            <nz-table class="issueTable" nzShowPagination="false" *ngIf="data" #assignedToMeTable [nzData]="data.issues"
+              nzPageSize="999999" [nzNoResult]="emptyAssignedToMe">
+              <thead>
+                <tr>
+                  <th>T</th>
+                  <th>Key</th>
+                  <th>Summary</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let i of assignedToMeTable.data" class="cursorpointer" (click)="openIssue(i.keyPair)">
+                  <td nz-tooltip nzTooltipTitle="{{i.issueType.name}}">
+                    <i class="issueType fa fa-{{i.issueType.iconUrl}}"></i>
+                  </td>
+                  <td style="white-space: nowrap;">
+                    {{i.project.key}}-{{i.key}}
+                  </td>
+                  <td><a style="color:#2C2B37">{{i.summary}}</a></td>
+                  <td>
+                    <span style="white-space: nowrap;"
+                      class="issueStatus issueStatus-{{i.currentStep.issueStatus.issueLifeCycle}}">{{i.currentStep.issueStatus.name}}</span>
+                  </td>
+                </tr>
+              </tbody>
+              <ng-template #emptyAssignedToMe>
+                <img src="/assets/img/empty.svg" class="jdempty" width="200">
+              </ng-template>
+            </nz-table>
+          </nz-card>
+          <ng-template #toMeExtra>
+            <a (click)="getAssignedToMe()">
+              <app-icon height="18" width="18" icon="arrow-repeat"></app-icon>
+            </a>
+          </ng-template>
+        </div>
+      </div>
+      <div class="Worklog">
+        <div class="card m-0" *ngIf="workData.length">
+          <nz-card class="homePageCard" nzTitle="Work log this week">
+            <canvas id="workLogChart"></canvas>
+          </nz-card>
+        </div>
+      </div>
+      <div class="Due">
+        <div class="card m-0">
+          <nz-card class="homePageCard" nzTitle="Due issues" [nzExtra]="DueCardExtra">
+            <nz-skeleton [nzLoading]="!dueData" [nzActive]="true" [nzParagraph]="{ rows: 4 }"></nz-skeleton>
+            <nz-table class="issueTable" nzShowPagination="false" *ngIf="dueData" #dueTable [nzData]="dueData.issues"
+              nzPageSize="999999" [nzNoResult]="createDocTemp">
+              <thead>
+                <tr>
+                  <th>T</th>
+                  <th>Key</th>
+                  <th>Summary</th>
+                  <th>Status</th>
+                  <th>Due</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let i of dueTable.data" (click)="openIssue(i.keyPair)" class="cursorpointer">
+                  <td nz-tooltip nzTooltipTitle="{{i.issueType.name}}">
+                    <i class="issueType fa fa-{{i.issueType.iconUrl}}"></i>
+                  </td>
+                  <td style="white-space: nowrap;" nz-tooltip nzTooltipTitle="{{i.summary}}">
+                    {{i.project.key}}-{{i.key}}
+                  </td>
+                  <td><a style="color:#2C2B37">{{i.summary}}</a></td>
+                  <td>
+                    <span style="white-space: nowrap;"
+                      class="issueStatus issueStatus-{{i.currentStep.issueStatus.issueLifeCycle}}">{{i.currentStep.issueStatus.name}}</span>
+                  </td>
+                  <td nz-tooltip nzTooltipTitle="{{i.dueDate | date: 'medium'}}"><span *ngIf=" i.dueDate"
+                      [class.alreadyDue]="isDue(i.dueDate)">
+                      {{i.dueDate| timeAgo}}</span></td>
+                  <td>
+                    <div class="d-flex align-items-center" nz-tooltip
+                      nzTooltipTitle="{{i.assignee ? i.assignee.fullName : 'unassigned'}}">
+                      <app-usermedia *ngIf="i.assignee" [tooltip]="i.assignee.fullName" [s]="'d24'"
+                        [pic]="i.assignee.pic" [user]="i.assignee">
+                      </app-usermedia>
+                      <app-usermedia *ngIf="!i.assignee" [tooltip]="'?'" [s]="'d24'" [pic]="'unassigned'">
+                      </app-usermedia>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+              <ng-template #createDocTemp>
+                <img src="/assets/img/empty.svg" class="jdempty" width="200">
+              </ng-template>
+            </nz-table>
+          </nz-card>
+          <ng-template #DueCardExtra>
+            <span nz-tooltip nzTooltipTitle="Task due for the next five days">
+              <app-icon height="18" width="18" icon="question-circle"></app-icon>
+            </span>
+            <a (click)="getDue()" class="ml-2">
+              <app-icon height="18" width="18" icon="arrow-repeat"></app-icon>
+            </a>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+    <div class="row m-0">
+      <div class="col">
+
+      </div>
+      <div class="col">
+
+      </div>
+      <div class="col">
+
+      </div>
+    </div>
+    <div class="row m-0">
+      <div class="col-8">
+
+      </div>
+    </div>
+    <div class="row m-0 p-0" *ngIf="!loading && overview.length == 0">
+      <div class="col-12">
+        <nz-empty *ngIf="overview.length == 0" nzNotFoundImage="/assets/img/not_found.svg" class="issue_empty"
+          [nzNotFoundContent]="contentTpl" style="width: 100%"></nz-empty>
+        <ng-template #contentTpl>
+          <h5>
+            <h4>No projects assigned </h4><br>contact Joindesk administrator or project manager
+          </h5>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
