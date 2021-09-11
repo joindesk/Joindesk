@@ -1,19 +1,32 @@
 version: "3.7"
 services:
     web:
-        image: jdfrontend
+        image: pradeepk1905/joindesk_frontend:0.6.1
         ports:
             - "443:443"
         environment:
             - NGINX_PORT=443
-	depends_on:
+        depends_on:
             - backend
     backend:
-        image: jdbackend
+        image: pradeepk1905/joindesk_backend:0.6.1
         environment:
             - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
             - SPRING_DATASOURCE_USERNAME=${POSTGRES_NON_ROOT_USER}
             - SPRING_DATASOURCE_PASSWORD=${POSTGRES_NON_ROOT_PASSWORD}
+            - JD_EMAIL=${JD_EMAIL}
+            - JD_EMAIL_HOST=${JD_EMAIL_HOST}
+            - JD_EMAIL_PORT=${JD_EMAIL_PORT}
+            - JD_EMAIL_USERNAME=${JD_EMAIL_USERNAME}
+            - JD_EMAIL_PASSWORD=${JD_EMAIL_PASSWORD}
+            - JD_EMAIL_SMTP_AUTH=${JD_EMAIL_SMTP_AUTH}
+            - JD_EMAIL_SMTP_STARTTLS_ENABLE=${JD_EMAIL_SMTP_STARTTLS_ENABLE}
+            - JD_EMAIL_SMTP_STARTTLS_REQUIRED=${JD_EMAIL_SMTP_STARTTLS_REQUIRED}
+            - JD_EMAIL_SSL_TRUST=${JD_EMAIL_SSL_TRUST}
+            - JD_DATA_DIR=${JD_DATA_DIR}
+            - JD_DATA_TEMP_DIR=${JD_DATA_TEMP_DIR}
+            - JD_MAX_FILE_SIZE=${JD_MAX_FILE_SIZE}
+            - APP_DOMAIN=${APP_DOMAIN}
         ports:
             - "9000:9000"
         depends_on:
