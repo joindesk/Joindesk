@@ -1,11 +1,27 @@
 package com.ariseontech.joindesk.issues.domain;
 
 public enum WorkflowTransitionPropertySubTypes {
-    CONDITION_CURRENT_USER,
-    CONDITION_IS_IN_GROUP,
-    CONDITION_HAS_PERMISSION,
-    CONDITION_FIELD_REQUIRED,
-    CONDITION_CHECKLIST_COMPLETE,
-    POST_FUNCTION_ASSIGN_TO_USER,
-    POST_FUNCTION_UPDATE_FIELD
+    CONDITION_CURRENT_USER("User is"),
+    CONDITION_IS_IN_GROUP("User is in group"),
+    CONDITION_HAS_PERMISSION("User has permission"),
+    CONDITION_FIELD_REQUIRED("Required check for field"),
+    CONDITION_CHECKLIST_COMPLETE("Issue checklist is complete"),
+    POST_FUNCTION_ASSIGN_TO_USER("Update issue field"),
+    POST_FUNCTION_UPDATE_FIELD("Assign issue to user");
+
+    private String displayName;
+
+    WorkflowTransitionPropertySubTypes(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String displayName() {
+        return displayName;
+    }
+
+    // Optionally and/or additionally, toString.
+    @Override
+    public String toString() {
+        return displayName;
+    }
 }

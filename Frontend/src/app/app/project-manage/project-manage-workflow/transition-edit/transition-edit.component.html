@@ -20,7 +20,7 @@
     <table class="table table-hover dataTable no-footer" *ngIf="transitions">
       <tbody>
         <tr *ngFor="let tr of getTransitions(t.key)">
-          <td>{{tr.subType}}</td>
+          <td>{{keyMap[tr.subType] ? keyMap[tr.subType] : tr.subType}}</td>
           <td>{{tr.key}}</td>
           <td>{{tr.displayValue}}</td>
           <td class="cursorpointer" (click)="removeTransitionProperty(tr)">
@@ -36,14 +36,14 @@
           <mat-select (selectionChange)="changeSubType(t,$event)" name="subType" [(ngModel)]="model.subType">
             <mat-option [value]=""></mat-option>
             <mat-option *ngFor="let s of t.values" [value]="s">
-              {{s}}
+              {{keyMap[s] ? keyMap[s] : s}}
             </mat-option>
           </mat-select>
         </div>
       </div>
       <div class="col-6" *ngIf="model.subType">
         <form (ngSubmit)="addCondition()" #stepForm="ngForm" ngNativeValidate>
-          {{model.subType}}
+          {{keyMap[model.subType] ? keyMap[model.subType] : model.subType}}
           <div *ngIf="model.fields">
             <div class="form-group" *ngIf="model.fields.type === 'select'">
               <label>{{model.fields.label}}</label>

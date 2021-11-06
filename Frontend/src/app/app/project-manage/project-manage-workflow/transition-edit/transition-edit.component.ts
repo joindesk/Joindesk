@@ -16,7 +16,7 @@ export class TransitionEditComponent implements OnInit {
   @Input() public projectKey;
   @Input() public workflowID: number;
   @Input() public transitionID: number;
-  public types: {};
+  public types: [];
   public model = {
     type: undefined,
     condition: "OR",
@@ -25,6 +25,7 @@ export class TransitionEditComponent implements OnInit {
     subTypeValue: undefined,
     fields: undefined
   };
+  public keyMap = {};
   constructor(private workflowService: WorkflowService, private toastr: JDToastrService) { }
 
   ngOnInit() {
@@ -34,6 +35,11 @@ export class TransitionEditComponent implements OnInit {
   open() {
     this.workflowService.getTransitionproperties(this.projectKey).subscribe(resp => {
       this.types = resp;
+      resp.forEach(av => {
+        Object.keys(av.keyMap).forEach(v => {
+          this.keyMap[v] = av.keyMap[v];
+        })
+      });
     });
     this.getProperties();
   }

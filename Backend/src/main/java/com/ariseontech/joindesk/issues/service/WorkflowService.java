@@ -466,6 +466,8 @@ public class WorkflowService {
             JSONObject type = new JSONObject();
             type.put("key", t);
             type.put("values", Arrays.stream(WorkflowTransitionPropertySubTypes.values()).map(Enum::name).filter(s -> s.startsWith(t)).toArray());
+            type.put("keyMap", Arrays.stream(WorkflowTransitionPropertySubTypes.values()).filter(s -> s.name().startsWith(t))
+                    .collect(Collectors.toMap(v -> v.name(),v -> v.displayName())));
             resp.put(type);
         });
         return resp.toString();
