@@ -1,11 +1,10 @@
 version: "3.7"
 services:
     web:
-        image: pradeepk1905/joindesk_frontend:0.6.1
+        image: pradeepk1905/joindesk_frontend:0.6.2
         ports:
+            - "80:80"
             - "443:443"
-        environment:
-            - NGINX_PORT=443
         depends_on:
             - backend
     backend:
