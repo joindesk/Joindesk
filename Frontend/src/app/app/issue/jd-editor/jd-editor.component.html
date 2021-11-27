@@ -83,10 +83,11 @@
         </nz-spin>
     </div>
 </ng-template>
-<div *ngIf="field == 'desc'" class="editable">
+<div *ngIf="field == 'desc'" class="editable issue-desc">
     <div *ngIf="editmode=='view'" style="position: relative;" (mouseenter)="editable ? pencil = true: pencil = false"
         (mouseleave)="pencil = false">
-        <div class="commentRender" [class.pencil]="pencil" style="border: none;" [innerHTML]="reviewHtml"></div>
+        <div class="commentRender" [class.pencil]="pencil" style="border: none;min-height:3rem"
+            [innerHTML]="reviewHtml"></div>
         <button *ngIf=" pencil" (click)="editDesc()" class="issueQuickButtons p-2" nz-button nz-tooltip
             nzTooltipTitle="Edit" style=" position:absolute; top:0; right:0;margin:5px;">
             <app-icon height="20" width="20" icon="pencil"> </app-icon>

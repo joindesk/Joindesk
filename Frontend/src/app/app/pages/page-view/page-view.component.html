@@ -1,227 +1,200 @@
 <nz-layout class="wiki-area">
-  <nz-layout class="wikiLayout">
-    <nz-content>
-      <div class="row p-0 m-0" style="height: 100%;">
-        <div class=" col-md-2 d-none d-sm-none d-md-block sideBar pl-1">
-          <button class="ml-3 issueCreateHeaderBtn" nz-button nzType="primary" (click)="create()"
-            *ngIf="canCreate">Create</button>
-          <button nz-button nzType="default" (click)="openSearch()" nz-tooltip nzTooltipTitle="Search">
+    <nz-layout class="wikiLayout">
+        <nz-content>
+            <div class="row p-0 m-0" style="height: 100%;">
+                <div class=" col-md-2 d-none d-sm-none d-md-block sideBar pl-1">
+                    <button class="ml-3 issueCreateHeaderBtn" nz-button nzType="primary" (click)="create()" *ngIf="canCreate">Create</button>
+                    <button nz-button nzType="default" (click)="openSearch()" nz-tooltip nzTooltipTitle="Search">
             <app-icon height="18" width="18" icon="search"> </app-icon>
           </button>
-          <div class="mt-1"></div>
-          <nz-tree [nzData]="tree" nzAsyncData (nzClick)="openFolder($event)" (nzExpandChange)="nzEvent($event)"
-            [nzTreeTemplate]="nzTreeFileTemplate">
-            <ng-template #nzTreeFileTemplate let-node>
-              <span class="custom-node" [class.active]="activeNode == node.key">
+                    <div class="mt-1"></div>
+                    <nz-tree [nzData]="tree" nzAsyncData (nzClick)="openFolder($event)" (nzExpandChange)="nzEvent($event)" [nzTreeTemplate]="nzTreeFileTemplate">
+                        <ng-template #nzTreeFileTemplate let-node>
+                            <span class="custom-node" [class.active]="activeNode == node.key">
                 <span *ngIf="!node.isLeaf" class="cursorpointer">
                   <span class="folder-name" nz-tooltip [nzTooltipTitle]="node.title" nzTooltipPlacement="topLeft">
                     {{ node.title }}</span>
-                </span>
-                <span *ngIf="node.isLeaf" class="cursorpointer">
+                            </span>
+                            <span *ngIf="node.isLeaf" class="cursorpointer">
                   <span class="file-name" nz-tooltip [nzTooltipTitle]="node.title" nzTooltipPlacement="topLeft">
                     {{ node.title }}</span>
-                </span>
-              </span>
-            </ng-template>
-          </nz-tree>
-        </div>
-        <div class="col-12 col-md-10 wikiContentArea" *ngIf="wiki && wikiKey > 0">
-          <nz-page-header class="wikiHeader">
-            <nz-page-header-title>
-              <nz-breadcrumb nzSeparator="/">
-                <nz-breadcrumb-item>
-                  <a routerLink="/project/{{projectKey}}/page/">
-                    <app-icon height="18" width="18" icon="house"> </app-icon>
-                  </a>
-                </nz-breadcrumb-item>
-                <nz-breadcrumb-item *ngFor="let b of breadcrumb">
-                  <a routerLink="/project/{{projectKey}}/page/{{b.id}}">{{b.title}}</a>
-                </nz-breadcrumb-item>
-              </nz-breadcrumb>
-            </nz-page-header-title>
-            <nz-page-header-extra>
-              <button *ngIf="wiki.editable" routerLink="../edit/{{wiki.id}}" class="wikiEditBtn" nz-button
-                nzType="primary">Edit</button>
-              <button *ngIf="wiki.deletable" class="wikiEditBtn" nz-button (click)="delete()" nzType="dashed"><i nz-icon
+                            </span>
+                            </span>
+                        </ng-template>
+                    </nz-tree>
+                </div>
+                <div class="col-12 col-md-10 wikiContentArea" *ngIf="wiki && wikiKey > 0">
+                    <nz-page-header class="wikiHeader">
+                        <nz-page-header-title>
+                            <nz-breadcrumb nzSeparator="/">
+                                <nz-breadcrumb-item>
+                                    <a routerLink="/project/{{projectKey}}/page/">
+                                        <app-icon height="18" width="18" icon="house"> </app-icon>
+                                    </a>
+                                </nz-breadcrumb-item>
+                                <nz-breadcrumb-item *ngFor="let b of breadcrumb">
+                                    <a routerLink="/project/{{projectKey}}/page/{{b.id}}">{{b.title}}</a>
+                                </nz-breadcrumb-item>
+                            </nz-breadcrumb>
+                        </nz-page-header-title>
+                        <nz-page-header-extra>
+                            <button *ngIf="wiki.editable" routerLink="../edit/{{wiki.id}}" class="wikiEditBtn" nz-button nzType="primary">Edit</button>
+                            <button *ngIf="wiki.deletable" class="wikiEditBtn" nz-button (click)="delete()" nzType="dashed"><i nz-icon
                   nzType="delete" nzTheme="outline"></i></button>
-              <nz-divider nzType="vertical"></nz-divider>
-              <button nz-button nzType="dashed" (click)="copyText()">
+                            <nz-divider nzType="vertical"></nz-divider>
+                            <button nz-button nzType="dashed" (click)="copyText()">
                 <app-icon height="18" width="18" icon="share"></app-icon>
               </button>
-              <button nz-dropdown [nzDropdownMenu]="wikiDrop" nz-button nzType="dashed">
+                            <button nz-dropdown [nzDropdownMenu]="wikiDrop" nz-button nzType="dashed">
                 <app-icon height="18" width="18" icon="three-dots"></app-icon>
               </button>
-              <nz-dropdown-menu #wikiDrop="nzDropdownMenu">
-                <ul nz-menu nzSelectable>
-                  <li *ngIf="wiki.editable" nz-menu-item
-                    (click)="copyPageModal(wiki, 'copy', 'document',copyModalContent, copyModalFooter)">
-                    Copy</li>
-                  <li *ngIf="wiki.editable" nz-menu-item
-                    (click)="movePageModal(wiki,'move','document',copyModalContent, copyModalFooter)">
-                    Move</li>
-                  <li nz-menu-item routerLink="history">History</li>
-                </ul>
-              </nz-dropdown-menu>
-            </nz-page-header-extra>
-          </nz-page-header>
-          <div class="wikiTitle pl-4 pr-4 mt-4">{{wiki.title}}</div>
-          <div class="row m-0">
-            <div class="col-11 p-0">
-              <div class="pl-4 pr-4 mt-2 wikiDates">
-                <p class="hint-text small">Created
-                  <span nz-tooltip nzTooltipPlacement="topLeft"
-                    nzTooltipTitle="{{wiki.created | date:'long'}}">{{wiki.created| timeAgo}}</span> by
-                  {{wiki.createdLogin.fullName}}
-                </p>
-                <p class="hint-text small" *ngIf="wiki.lastUpdatedLogin">Updated <span nz-tooltip
-                    nzTooltipPlacement="topLeft" nzTooltipTitle="{{wiki.updated | date:'long'}}">{{wiki.updated|
-                    timeAgo}}</span> <span
-                    *ngIf="wiki.lastUpdatedLogin && wiki.createdLogin.id != wiki.lastUpdatedLogin.id"> by
+                            <nz-dropdown-menu #wikiDrop="nzDropdownMenu">
+                                <ul nz-menu nzSelectable>
+                                    <li *ngIf="wiki.editable" nz-menu-item (click)="copyPageModal(wiki, 'copy', 'document',copyModalContent, copyModalFooter)">
+                                        Copy</li>
+                                    <li *ngIf="wiki.editable" nz-menu-item (click)="movePageModal(wiki,'move','document',copyModalContent, copyModalFooter)">
+                                        Move</li>
+                                    <li nz-menu-item routerLink="history">History</li>
+                                </ul>
+                            </nz-dropdown-menu>
+                        </nz-page-header-extra>
+                    </nz-page-header>
+                    <div class="wikiTitle pl-4 pr-4 mt-4">{{wiki.title}}</div>
+                    <div class="row m-0">
+                        <div class="col-11 p-0">
+                            <div class="pl-4 pr-4 mt-2 wikiDates">
+                                <p class="hint-text small">Created
+                                    <span nz-tooltip nzTooltipPlacement="topLeft" nzTooltipTitle="{{wiki.created | date:'long'}}">{{wiki.created| timeAgo}}</span> by {{wiki.createdLogin.fullName}}
+                                </p>
+                                <p class="hint-text small" *ngIf="wiki.lastUpdatedLogin">Updated <span nz-tooltip nzTooltipPlacement="topLeft" nzTooltipTitle="{{wiki.updated | date:'long'}}">{{wiki.updated|
+                    timeAgo}}</span> <span *ngIf="wiki.lastUpdatedLogin && wiki.createdLogin.id != wiki.lastUpdatedLogin.id"> by
                     {{wiki.lastUpdatedLogin.fullName}}</span>
-                </p>
-              </div>
-            </div>
-            <div class="col-1 p-0 text-right d-none d-sm-none d-md-none d-lg-block" id="rightSideBarToggle">
-              <button nz-button nzType="default" *ngIf="!hideSideBar" (click)="hideSideBar = !hideSideBar">
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-1 p-0 text-right d-none d-sm-none d-md-none d-lg-block" id="rightSideBarToggle">
+                            <button nz-button nzType="default" *ngIf="!hideSideBar" (click)="hideSideBar = !hideSideBar">
                 <app-icon height="18" width="18" icon="arrow-right-square" class="mr-1"> </app-icon>
               </button>
-              <button nz-button nzType="default" *ngIf="hideSideBar" (click)="hideSideBar = !hideSideBar">
+                            <button nz-button nzType="default" *ngIf="hideSideBar" (click)="hideSideBar = !hideSideBar">
                 <app-icon height="18" width="18" icon="arrow-left-square" class="mr-1"> </app-icon>
               </button>
-            </div>
-          </div>
-          <div class="row m-0">
-            <div class="col-12 col-lg-9 pr-0" [class.col-lg-12]="hideSideBar">
-              <nz-skeleton [nzLoading]="loading" [nzActive]="true"></nz-skeleton>
-              <div id="view-editormd" [class.hide]="loading" class="pl-2">
-                <textarea style="display:none;" [value]="wiki.content"></textarea>
-              </div>
-              <div>
-                <h6 [class.hide]="loading" class="mt-5 mb-0 uppercase hint-text">Attachments</h6>
-                <ng-template #createDocTemp>
-                  No attachments found
-                </ng-template>
-                <nz-table class="issueAttachmentTbl" nzShowPagination="false" nzPageSize="999999" #attachmentTable
-                  [nzData]="attachments" [nzNoResult]="createDocTemp">
-                  <tbody>
-                    <tr *ngFor="let a of attachmentTable.data" (mouseenter)="showIcon['att-'+a.id] = true"
-                      (mouseleave)="showIcon['att-'+a.id] = false">
-                      <td class="p-2">
-                        <div class="commentsWrapper">
-                          <div class="right">
-                            <a (click)="preview(a)" style="cursor: pointer;">
-                              <h5 class="m-0"
-                                style="font-family: Heebo;font-weight: 500;font-size: 14px;color: #001737;">
-                                {{a.originalName}}</h5>
-                            </a>
-                            <p class="m-0" style="font-size: 10px;color: #414141;font-weight: 500;">{{a.created | date}}
-                              by
-                              {{a.createdBy}}
-                            </p>
-                          </div>
                         </div>
-                      </td>
-                      <td style="min-width: 60px;">
-                        <a *ngIf="showIcon['att-'+a.id]" class="pull-right attachmentExtra" (click)="detach(a)">
-                          <i nz-icon nzType="delete" nzTheme="outline"></i>
-                        </a>
-                        <a *ngIf="showIcon['att-'+a.id]" class="mr-2 attachmentExtra pull-right"
-                          (click)="downloadFile(a.id, a.originalName)">
-                          <i nz-icon nzType="download" nzTheme="outline"></i>
-                        </a>
-                      </td>
-                    </tr>
-                  </tbody>
-                </nz-table>
-                <div class="text-center attachmentarea mt-2 p-5 mb-2" *ngIf="wiki.editable"
-                  style="    border: 2px dashed lightgrey; border-radius: 5px;" (drop)="dropHandler($event)"
-                  (dragover)="dragOverHandler($event)" (dragend)="onDragEnd($event)">Drag and Drop to attach or
-                  <a class="edit btn btn-xs" (click)="fileInput.click()">click here</a>
-                  <input type="file" id="attachmentInpt" name="descAttachment" #fileInput (change)="attachFile($event)"
-                    class="hide" />
+                    </div>
+                    <div class="row m-0">
+                        <div class="col-12 col-lg-9 pr-0" [class.col-lg-12]="hideSideBar">
+                            <nz-skeleton [nzLoading]="loading" [nzActive]="true"></nz-skeleton>
+                            <div id="view-editormd" [class.hide]="loading" class="pl-2">
+                                <textarea style="display:none;" [value]="wiki.content"></textarea>
+                            </div>
+                            <div>
+                                <h6 [class.hide]="loading" class="mt-5 mb-0 uppercase hint-text">Attachments</h6>
+                                <ng-template #createDocTemp>
+                                    No attachments found
+                                </ng-template>
+                                <nz-table class="issueAttachmentTbl" nzShowPagination="false" nzPageSize="999999" #attachmentTable [nzData]="attachments" [nzNoResult]="createDocTemp">
+                                    <tbody>
+                                        <tr *ngFor="let a of attachmentTable.data" (mouseenter)="showIcon['att-'+a.id] = true" (mouseleave)="showIcon['att-'+a.id] = false">
+                                            <td class="p-2">
+                                                <div class="commentsWrapper">
+                                                    <div class="right">
+                                                        <a (click)="preview(a)" style="cursor: pointer;">
+                                                            <h5 class="m-0" style="font-family: Heebo;font-weight: 500;font-size: 14px;color: #001737;">
+                                                                {{a.originalName}}</h5>
+                                                        </a>
+                                                        <p class="m-0" style="font-size: 10px;color: #414141;font-weight: 500;">{{a.created | date}} by {{a.createdBy}}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td style="min-width: 60px;">
+                                                <a *ngIf="showIcon['att-'+a.id]" class="mr-2 pull-right attachmentExtra" (click)="detach(a)">
+                                                    <i nz-icon nzType="delete" nzTheme="outline"></i>
+                                                </a>
+                                                <a *ngIf="showIcon['att-'+a.id]" class="mr-3 attachmentExtra pull-right" (click)="downloadFile(a.id, a.originalName)">
+                                                    <i nz-icon nzType="download" nzTheme="outline"></i>
+                                                </a>
+                                                <a *ngIf="showIcon['att-'+a.id]" class="mr-3 attachmentExtra pull-right" (click)="getFileLink(a)" nz-tooltip nzTooltipTitle="Get Markdown embed code">
+                                                    <i nz-icon nzType="code" nzTheme="outline"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </nz-table>
+                                <div class="text-center attachmentarea mt-2 p-5 mb-2" *ngIf="wiki.editable" style="    border: 2px dashed lightgrey; border-radius: 5px;" (drop)="dropHandler($event)" (dragover)="dragOverHandler($event)" (dragend)="onDragEnd($event)">Drag and Drop to attach or
+                                    <a class="edit btn btn-xs" (click)="fileInput.click()">click here</a>
+                                    <input type="file" id="attachmentInpt" name="descAttachment" #fileInput (change)="attachFile($event)" class="hide" />
+                                </div>
+                            </div>
+                        </div>
+                        <div id="rightSideBar" [class.hide]="hideSideBar" class="col-md-3 p-0 d-none d-sm-none d-md-none d-lg-block right-sideBar">
+                            <nz-affix [nzOffsetTop]="120">
+                                <nz-card nzTitle="Table of Contents" class="wikiSideCard mt-2">
+                                    <div id="custom-toc-container"></div>
+                                </nz-card>
+                            </nz-affix>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <div id="rightSideBar" [class.hide]="hideSideBar"
-              class="col-md-3 p-0 d-none d-sm-none d-md-none d-lg-block right-sideBar">
-              <nz-affix [nzOffsetTop]="120">
-                <nz-card nzTitle="Table of Contents" class="wikiSideCard mt-2">
-                  <div id="custom-toc-container"></div>
-                </nz-card>
-              </nz-affix>
-            </div>
-          </div>
-        </div>
-        <div class="col-12 col-md-10 wikiContentArea" *ngIf="wikiKey == 0">
-          <div class="row">
-            <div class="col-10">
-              <h2>Home</h2>
-            </div>
-            <div class="col-2 p-2">
-              <button class="ml-3 issueCreateHeaderBtn" nz-button nzType="primary" routerLink="../edit/0"
-                *ngIf="canCreate">Create</button>
-            </div>
-          </div>
-          <div *ngIf="recentPages">
-            <h6 class="mt-3 hint-text uppercase">Recently updated</h6>
-            <div *ngFor="let item of recentPages" class="mb-3">
-              <a routerLink="../{{item.id}}">
-                <h5 class="black-text no-margin">{{item.title}}</h5>
-              </a>
-              <p class="location hint-text" *ngIf="!item.lastUpdatedLogin">Created
-                <span nz-tooltip nzTooltipPlacement="topLeft"
-                  nzTooltipTitle="{{item.created | date:'long'}}"><i>{{item.created| timeAgo}}</i></span> by
-                {{item.createdLogin.fullName}}
-              </p>
-              <p class="location hint-text" *ngIf="item.lastUpdatedLogin">updated <span nz-tooltip
-                  nzTooltipPlacement="topLeft" nzTooltipTitle="{{item.updated | date:'long'}}"><i>{{item.updated|
+                <div class="col-12 col-md-10 wikiContentArea" *ngIf="wikiKey == 0">
+                    <div class="row">
+                        <div class="col-10">
+                            <h2>Home</h2>
+                        </div>
+                        <div class="col-2 p-2">
+                            <button class="ml-3 issueCreateHeaderBtn" nz-button nzType="primary" routerLink="../edit/0" *ngIf="canCreate">Create</button>
+                        </div>
+                    </div>
+                    <div *ngIf="recentPages">
+                        <h6 class="mt-3 hint-text uppercase">Recently updated</h6>
+                        <div *ngFor="let item of recentPages" class="mb-3">
+                            <a routerLink="../{{item.id}}">
+                                <h5 class="black-text no-margin">{{item.title}}</h5>
+                            </a>
+                            <p class="location hint-text" *ngIf="!item.lastUpdatedLogin">Created
+                                <span nz-tooltip nzTooltipPlacement="topLeft" nzTooltipTitle="{{item.created | date:'long'}}"><i>{{item.created| timeAgo}}</i></span> by {{item.createdLogin.fullName}}
+                            </p>
+                            <p class="location hint-text" *ngIf="item.lastUpdatedLogin">updated <span nz-tooltip nzTooltipPlacement="topLeft" nzTooltipTitle="{{item.updated | date:'long'}}"><i>{{item.updated|
                     timeAgo}}</i></span> <span *ngIf="item.lastUpdatedLogin"> by
                   {{item.lastUpdatedLogin.fullName}}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </nz-content>
-  </nz-layout>
+        </nz-content>
+    </nz-layout>
 </nz-layout>
-<nz-drawer [nzVisible]="searchDrawerModal" nzPlacement="left" nzTitle="Search" nzWidth="60vw"
-  (nzOnClose)="searchDrawerModal = false">
-  <input type="text" class="form-control m-t-10" #searchInput autofocus (input)="search(searchInput.value)"
-    placeholder="Search" />
-  <nz-skeleton [nzLoading]="searching" [nzActive]="true" [nzParagraph]="{ rows: 4 }"></nz-skeleton>
-  <span class="m-t-5"
-    *ngIf="wikiResults != undefined && wikiResults.length == 0">
+<nz-drawer [nzVisible]="searchDrawerModal" nzPlacement="left" nzTitle="Search" nzWidth="60vw" (nzOnClose)="searchDrawerModal = false">
+    <input type="text" class="form-control m-t-10" #searchInput autofocus (input)="search(searchInput.value)" placeholder="Search" />
+    <nz-skeleton [nzLoading]="searching" [nzActive]="true" [nzParagraph]="{ rows: 4 }"></nz-skeleton>
+    <span class="m-t-5" *ngIf="wikiResults != undefined && wikiResults.length == 0">
     <nz-empty [nzNotFoundContent]="'No results found'"></nz-empty>
   </span>
-  <ul class="list-group">
-    <li class="list-group-item" *ngFor="let w of wikiResults">
-      <a routerLink="../{{ w.id }}" (click)="searchDrawerModal = false">
-        <app-icon height="18" width="18" icon="journal-richtext" class="mr-1"> </app-icon>
-        {{w.title}}
-      </a>
-    </li>
-  </ul>
-  <div
-    *ngIf="recentWikis.length > 0 && ((wikiResults == undefined) || searchInput.value.length <= 0)"
-    class="mt-5">
-    <h3>Updated Recently</h3>
     <ul class="list-group">
-      <li class="list-group-item" *ngFor="let w of recentWikis">
-        <a routerLink="../{{ w.id }}" (click)="searchDrawerModal = false">
-          <app-icon height="18" width="18" icon="journal-richtext" class="mr-1"> </app-icon>
-          {{w.title}}
-        </a>
-      </li>
+        <li class="list-group-item" *ngFor="let w of wikiResults">
+            <a routerLink="../{{ w.id }}" (click)="searchDrawerModal = false">
+                <app-icon height="18" width="18" icon="journal-richtext" class="mr-1"> </app-icon>
+                {{w.title}}
+            </a>
+        </li>
     </ul>
-  </div>
+    <div *ngIf="recentWikis.length > 0 && ((wikiResults == undefined) || searchInput.value.length <= 0)" class="mt-5">
+        <h3>Updated Recently</h3>
+        <ul class="list-group">
+            <li class="list-group-item" *ngFor="let w of recentWikis">
+                <a routerLink="../{{ w.id }}" (click)="searchDrawerModal = false">
+                    <app-icon height="18" width="18" icon="journal-richtext" class="mr-1"> </app-icon>
+                    {{w.title}}
+                </a>
+            </li>
+        </ul>
+    </div>
 </nz-drawer>
 <ng-template #copyModalContent>
-  <nz-tree-select style="width: 250px" nzPlaceHolder="Please select" [(ngModel)]="target"
-    [nzDropdownMatchSelectWidth]="true" [nzNodes]="tree" [nzAsyncData]="true" (nzExpandChange)="expand($event)">
-  </nz-tree-select>
+    <nz-tree-select style="width: 250px" nzPlaceHolder="Please select" [(ngModel)]="target" [nzDropdownMatchSelectWidth]="true" [nzNodes]="tree" [nzAsyncData]="true" (nzExpandChange)="expand($event)">
+    </nz-tree-select>
 </ng-template>
 <ng-template #copyModalFooter>
-  <button nz-button nzType="default" (click)="closeModal()">cancel</button>
-  <button nz-button nzType="primary" *ngIf="target" (click)="performAction()"
-    [nzLoading]="modalButtonLoading">{{currentAction.type}}</button>
+    <button nz-button nzType="default" (click)="closeModal()">cancel</button>
+    <button nz-button nzType="primary" *ngIf="target" (click)="performAction()" [nzLoading]="modalButtonLoading">{{currentAction.type}}</button>
 </ng-template>

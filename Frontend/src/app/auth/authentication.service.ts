@@ -68,12 +68,12 @@ export class AuthenticationService {
             .pipe(map(resp => {
                 if (resp.status === 200 && resp.body.success) {
                     const token = resp.headers.get('X-AUTH-TOKEN');
-                    localStorage.setItem('jdtok', token);
+                    localStorage.setItem('JD-T', token);
                     this.getUser();
                     this.storeAuthCookies();
                     return resp.body;
                 } else {
-                    localStorage.removeItem('jdtok');
+                    localStorage.removeItem('JD-T');
                 }
                 return resp.body;
             })).pipe(catchError((e) => {
@@ -83,11 +83,13 @@ export class AuthenticationService {
     }
 
     storeAuthCookies() {
-        const token = localStorage.getItem('jdtok');
+        const token = localStorage.getItem('JD-T');
         if (token) {
-            this.cookieService.set('jdt', token.substr(0, token.length / 2), undefined, '/');
-            this.cookieService.set('jdx', token.substr(token.length / 2, token.length), undefined, '/');
-            this.cookieService.set('jdd', localStorage.getItem('JD-D'), undefined, '/');
+            this.cookieService.set('jdt', token, 1, '/', null, true, "None");
+            //this.cookieService.set('jdt', token.substr(0, token.length / 2), 365, '/');
+            //this.cookieService.set('jdx', token.substr(token.length / 2, token.length), 365, '/');
+            this.cookieService.set('jdd', localStorage.getItem('JD-D'), 1, '/', null, true, "None");
+            console.log(this.cookieService.getAll());
         } else {
             this.logout();
         }
@@ -98,9 +100,9 @@ export class AuthenticationService {
     }
 
     getUser() {
-        if (localStorage.getItem('jdtok')) {
+        if (localStorage.getItem('JD-T')) {
             const helper = new JwtHelperService();
-            const myRawToken = localStorage.getItem('jdtok');
+            const myRawToken = localStorage.getItem('JD-T');
             this.decodedToken = helper.decodeToken(myRawToken);
             const isExpired = helper.isTokenExpired(myRawToken);
             if (isExpired) {
@@ -150,10 +152,10 @@ export class AuthenticationService {
     }
 
     getToken() {
-        if (!localStorage.getItem('jdtok')) {
+        if (!localStorage.getItem('JD-T')) {
             return '';
         }
-        return localStorage.getItem('jdtok');
+        return localStorage.getItem('JD-T');
     }
 
     retry() {

@@ -37,9 +37,13 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        String authToken = httpRequest.getHeader("X-AUTH-TOKEN");
-        String apiToken = httpRequest.getHeader("X-API-TOKEN");
-        String deviceInfo = httpRequest.getHeader("X-JD-D");
+
+        String authToken = Optional.ofNullable(httpRequest.getHeader("X-AUTH-TOKEN"))
+                .orElse(Arrays.stream(httpRequest.getCookies()).filter(c -> c.getName().equals("jdt")).map(Cookie::getValue).findAny().orElse(null));
+        String apiToken = Optional.ofNullable(httpRequest.getHeader("X-API-TOKEN"))
+                .orElse(Arrays.stream(httpRequest.getCookies()).filter(c -> c.getName().equals("jda")).map(Cookie::getValue).findAny().orElse(null));
+        String deviceInfo = Optional.ofNullable(httpRequest.getHeader("X-JD-D"))
+                .orElse(Arrays.stream(httpRequest.getCookies()).filter(c -> c.getName().equals("jdd")).map(Cookie::getValue).findAny().orElse(null));
 
         String requestUri = httpRequest.getRequestURI();
         logger.debug("Hitting " + requestUri);

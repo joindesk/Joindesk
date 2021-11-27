@@ -381,8 +381,7 @@ export class PageViewComponent implements OnInit, AfterViewInit {
   }
 
   preview(a: PageAttachment) {
-    this.downloadFile(a.id, a.originalName);
-    return;
+    //this.downloadFile(a.id, a.originalName);  return;
     if (a.previewable && a.thumbnail) {
       this.previewImage(a);
     } else if (a.previewable && !a.thumbnail) {
@@ -428,6 +427,33 @@ export class PageViewComponent implements OnInit, AfterViewInit {
     const dialogRef = this.dialog.open(AppIssueViewImagePreviewComponent, {
       data: this.previewPath(a.id)
     });
+  }
+
+  getFileLink(a: PageAttachment) {
+    if (a.previewable) {
+      this.copy("![" + a.originalName + "](" +
+        location.origin + HttpService.getBaseURL() + '/page/' + this.projectKey + '/' + this.wiki.id
+        + '/attachment/' + a.id + '/)', "Embed code copied to clipboard");
+    } else {
+      this.copy("[" + a.originalName + "](" +
+        location.origin + HttpService.getBaseURL() + '/page/' + this.projectKey + '/' + this.wiki.id
+        + '/attachment/' + a.id + '/)', "Embed code copied to clipboard");
+    }
+  }
+
+  copy(value, message) {
+    let selBox = document.createElement('textarea');
+    selBox.style.position = 'fixed';
+    selBox.style.left = '0';
+    selBox.style.top = '0';
+    selBox.style.opacity = '0';
+    selBox.value = value;
+    document.body.appendChild(selBox);
+    selBox.focus();
+    selBox.select();
+    document.execCommand('copy');
+    document.body.removeChild(selBox);
+    this.toastr.successMessage(message);
   }
 
   dragOverHandler(event: DragEvent) {

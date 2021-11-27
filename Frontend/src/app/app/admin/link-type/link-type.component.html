@@ -1,67 +1,69 @@
 <nz-page-header [nzGhost]="false" nzTitle="Link Types">
-  <nz-page-header-extra>
-    <button nz-button (click)="create()">Create</button>
-  </nz-page-header-extra>
+    <nz-page-header-extra>
+        <button nzType="primary" nz-button (click)="create()">Create</button>
+    </nz-page-header-extra>
 </nz-page-header>
 <div class="m-0 mt-4 row">
-  <div class="col-6">
-    <nz-table class="issueTable" *ngIf="relationships" #relationshipsTable [nzData]="relationships" nzPageSize="999999"
-      [nzNoResult]="createDocTemp" nzShowPagination="false">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let r of relationshipsTable.data">
-          <td class="v-align-middle semi-bold">
-            {{r.name}}
-          </td>
-          <td>
-            <a (click)="openRelationship(r)" class="btn btn-default btn-xs pull-right">
-              <app-icon height="18" width="18" icon="arrow-right-short"> </app-icon>
-            </a>
-          </td>
-        </tr>
-      </tbody>
-      <ng-template #createDocTemp>
-        <img src="/assets/img/empty.svg" class="jdempty" width="200">
-      </ng-template>
-    </nz-table>
-  </div>
-  <div class="col-6">
-    <div class="card card-bordered" *ngIf="relationship">
-      <div class="card-header">
-        <div class="card-title">
-          <span *ngIf="!relationship.id">Create </span> {{relationship.name}}
-        </div>
-      </div>
-      <div class="card-body">
-        <p>
-          <form (ngSubmit)="save()" #issueTypeForm="ngForm" ngNativeValidate>
-            <div class="form-group">
-              <label>Name</label>
-              <input type="text" class="form-control" required name="groupName" placeholder="Name"
-                [(ngModel)]="relationship.name">
-            </div>
-            <div class="form-group">
-              <label>Outward Desc</label>
-              <input type="text" class="form-control" required name="outwardDesc" placeholder="Outward Desc"
-                [(ngModel)]="relationship.outwardDesc">
-            </div>
-            <div class="form-group">
-              <label>Inward Desc</label>
-              <input type="text" class="form-control" required name="inwardDesc" placeholder="Inward Desc"
-                [(ngModel)]="relationship.inwardDesc">
-            </div>
-            <button type="submit" class="ml-1" nz-button nzType="primary" *ngIf="!relationship.id">Create</button>
-            <button type="submit" class="ml-1" nz-button nzType="primary" *ngIf="relationship.id">Update</button>
-            <button type="button" class="ml-1" nz-button nzType="danger" (click)="delete()"
-              *ngIf="relationship.id">Delete</button>
-            <button type="button" (click)="cancel()" class="ml-1" nz-button nzType="default">Cancel</button>
-          </form>
-      </div>
+    <div class="col-6">
+        <nz-table class="issueTable" *ngIf="relationships" #relationshipsTable [nzData]="relationships"
+            nzPageSize="999999" [nzNoResult]="createDocTemp" nzShowPagination="false">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let r of relationshipsTable.data">
+                    <td class="v-align-middle semi-bold">
+                        {{r.name}}
+                    </td>
+                    <td>
+                        <a (click)="openRelationship(r)" class="btn btn-default btn-xs pull-right">
+                            <app-icon height="18" width="18" icon="arrow-right-short"> </app-icon>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+            <ng-template #createDocTemp>
+                <img src="/assets/img/empty.svg" class="jdempty" width="200">
+            </ng-template>
+        </nz-table>
     </div>
-  </div>
+    <div class="col-6">
+        <div class="card card-bordered" *ngIf="relationship">
+            <div class="card-header">
+                <div class="card-title">
+                    <span *ngIf="!relationship.id">Create </span> {{relationship.name}}
+                </div>
+            </div>
+            <div class="card-body">
+                <p>
+                <form (ngSubmit)="save()" #issueTypeForm="ngForm" ngNativeValidate>
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" class="form-control" required name="groupName" placeholder="Name"
+                            [(ngModel)]="relationship.name">
+                    </div>
+                    <div class="form-group">
+                        <label>Outward Desc</label>
+                        <input type="text" class="form-control" required name="outwardDesc" placeholder="Outward Desc"
+                            [(ngModel)]="relationship.outwardDesc">
+                    </div>
+                    <div class="form-group">
+                        <label>Inward Desc</label>
+                        <input type="text" class="form-control" required name="inwardDesc" placeholder="Inward Desc"
+                            [(ngModel)]="relationship.inwardDesc">
+                    </div>
+                    <button type="submit" class="ml-1" nz-button nzType="primary"
+                        *ngIf="!relationship.id">Create</button>
+                    <button type="submit" class="ml-1" nz-button nzType="primary"
+                        *ngIf="relationship.id">Update</button>
+                    <button type="button" class="ml-1" nz-button nzType="danger" (click)="delete()"
+                        *ngIf="relationship.id">Delete</button>
+                    <button type="button" (click)="cancel()" class="ml-1" nz-button nzType="default">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

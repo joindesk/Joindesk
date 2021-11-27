@@ -674,8 +674,36 @@ export class IssueViewComponent implements OnInit, OnDestroy {
     });
   }
 
+  getFileLink(a: Attachment) {
+    if (a.previewable) {
+      this.copy("![" + a.originalName + "](" +
+        location.origin + HttpService.getBaseURL() + '/issue/' + this.projectKey + '/'
+        + this.issueKey + '/attachment/' + a.id + '/)', "Embed code copied to clipboard");
+    } else {
+      this.copy("[" + a.originalName + "](" +
+        location.origin + HttpService.getBaseURL() + '/issue/' + this.projectKey + '/'
+        + this.issueKey + '/attachment/' + a.id + '/)', "Embed code copied to clipboard");
+    }
+  }
+
+
+  copy(value, message) {
+    let selBox = document.createElement('textarea');
+    selBox.style.position = 'fixed';
+    selBox.style.left = '0';
+    selBox.style.top = '0';
+    selBox.style.opacity = '0';
+    selBox.value = value;
+    document.body.appendChild(selBox);
+    selBox.focus();
+    selBox.select();
+    document.execCommand('copy');
+    document.body.removeChild(selBox);
+    this.toastr.successMessage(message);
+  }
+
   preview(a: Attachment) {
-    this.downloadFile(a.id, a.originalName); return;
+    //this.downloadFile(a.id, a.originalName); return;
     if (a.previewable && a.thumbnail) {
       this.previewImage(a.name);
     } else if (a.previewable && !a.thumbnail) {
