@@ -148,7 +148,7 @@ public class Issue extends AuditModel implements Serializable {
     @PropertyView("issue_detail")
     private Map<String, Boolean> permissions;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinTable(name = "issue_version", joinColumns = {@JoinColumn(name = "id")}, inverseJoinColumns = {@JoinColumn(name = "vid")})
     private Set<Version> versions = new HashSet<>();
 
@@ -156,7 +156,7 @@ public class Issue extends AuditModel implements Serializable {
     @PropertyView("issue_detail")
     private Set<Version> possibleVersions;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinTable(name = "issue_components", joinColumns = {@JoinColumn(name = "id")}, inverseJoinColumns = {@JoinColumn(name = "vid")})
     private List<Component> components = new ArrayList<>();
 
@@ -164,7 +164,7 @@ public class Issue extends AuditModel implements Serializable {
     @PropertyView("issue_detail")
     private Set<Component> possibleComponents;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinTable(name = "issue_labels", joinColumns = {@JoinColumn(name = "id")}, inverseJoinColumns = {@JoinColumn(name = "vid")})
     private List<Label> labels = new ArrayList<>();
 

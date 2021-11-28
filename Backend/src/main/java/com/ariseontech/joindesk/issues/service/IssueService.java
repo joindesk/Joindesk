@@ -825,7 +825,7 @@ public class IssueService {
             else if (!ObjectUtils.isEmpty(c.getDefaultValue())) {
                 finalCustomData.put(c.getKey(), c.getDefaultValue());
                 issueCustomRepo.updateCustomDataByIssue(issue.getId(), "array['" + c.getKey() + "']",
-                        '"' + c.getDefaultValue() + '"');
+                        '\"' + c.getDefaultValue() + '\"');
                 icf.setValue(finalCustomData.getString(c.getKey()));
             }
             customFields.add(icf);
@@ -1158,6 +1158,7 @@ public class IssueService {
     }
 
     @CacheEvict(value = "issueMinimal", key = "#projectKey + #issueKey")
+    @Transactional
     public void delete(Long issueKey, String projectKey) {
         Issue issue = getMinimal(projectKey, issueKey);
         if (!canDelete(issue.getProject()))

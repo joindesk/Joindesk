@@ -11,9 +11,12 @@ https://joindeskapp.com/
 * Gantt View
 * Custom fields
 * Custom workflow
+* Fine grained access control
 * Checklist 
 * Version / Release Management
 * Wiki
+* Webhooks
+* Firewall
 
 This tool is inspired and built as an alternative to JIRA, Confluence and many other similar tools. 
 This project is a side project build to learn and try out different features and technologies.

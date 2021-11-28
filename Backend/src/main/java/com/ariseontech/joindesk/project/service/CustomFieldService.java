@@ -106,7 +106,7 @@ public class CustomFieldService {
         customFieldRepo.save(customField);
         if (isNew) {
             customField.getIssueTypes().forEach(it -> issueCustomRepo.updateCustomDataByIssueType(it.getId(),
-                    customField.getKey(), customField.getDefaultValue()));
+                    customField.getKey(), "\"" + customField.getDefaultValue() + "\""));
         }
         return customField;
     }

@@ -6,8 +6,8 @@ public enum WorkflowTransitionPropertySubTypes {
     CONDITION_HAS_PERMISSION("User has permission"),
     CONDITION_FIELD_REQUIRED("Required check for field"),
     CONDITION_CHECKLIST_COMPLETE("Issue checklist is complete"),
-    POST_FUNCTION_ASSIGN_TO_USER("Update issue field"),
-    POST_FUNCTION_UPDATE_FIELD("Assign issue to user");
+    POST_FUNCTION_ASSIGN_TO_USER("Assign issue to user"),
+    POST_FUNCTION_UPDATE_FIELD("Update issue field");
 
     private String displayName;
 
