@@ -1,4 +1,6 @@
-# Issue features
+# Issue features <!-- {docsify-ignore} -->
+
+## Overview
 
 * Checklist
 * Attachments (Drag and Drop / Select file and upload)
@@ -10,6 +12,10 @@
 * Labels
 * Components
 
+[](issue_features_video.html ':include :type=iframe')
+
+[](create_update_video.html ':include :type=iframe')
+
 ## Create Issue
 ![](./img/create_issue.png)
 
@@ -17,16 +23,15 @@
 If data has been changed in search view / calendar / board / gantt chart
 ![](./img/issue_notification.png)
 
-# Search / Filter Issues
+## Search / Filter Issues
 Customize issue list display
 ![](./img/issue-search-screen.png)
 
-
-# Gantt
+## Gantt
 ![](./img/gantt-view.png)
 
-# Calendar
+## Calendar
 ![](./img/calendar-view.png)
 
-# Board
+## Board
 ![](./img/board-view.png)

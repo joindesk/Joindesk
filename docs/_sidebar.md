@@ -1,3 +1,5 @@
+![](./img/jd_logo.png)
+
 - [Home](/)
 - Getting Started
   - [Server Setup](setup.md)
