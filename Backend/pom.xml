@@ -5,7 +5,7 @@
 
     <groupId>com.joindeskapp</groupId>
     <artifactId>joindesk</artifactId>
-    <version>0.6.1</version>
+    <version>0.6.2</version>
     <packaging>jar</packaging>
 
     <name>joindesk</name>
