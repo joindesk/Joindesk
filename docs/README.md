@@ -1,6 +1,16 @@
 # Joindesk
 Opensource Project Management Tool
 
+![Overview](./img/Overview.jpg)
+![Dashboard](./img/Dashboard.jpg)
+![Issues](./img/Issues.jpg)
+![Calendar](./img/Calendar.jpg)
+![Gantt](./img/Gantt.png)
+![Board](./img/Board.jpg)
+![Reporting](./img/Reporting.jpg)
+![Issue-View](./img/Issue-View.jpg)
+![PermMgmt](./img/PermMgmt.jpg)
+
 ## Features
 * Issue Management
 * Kanban Board
@@ -22,3 +32,5 @@ This project is a side project build to learn and try out different features and
 - Spring boot 2.4 (Java 11)
 - Angular 8 (Bootstrap 4, Ant 8.5)
 - Postgres 12
+
+![End](./img/End.jpg)
