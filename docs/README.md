@@ -5,7 +5,6 @@ Opensource Project Management Tool
 ![Dashboard](./img/Dashboard.jpg)
 ![Issues](./img/Issues.jpg)
 ![Calendar](./img/Calendar.jpg)
-![Gantt](./img/Gantt.png)
 ![Board](./img/Board.jpg)
 ![Reporting](./img/Reporting.jpg)
 ![Issue-View](./img/Issue-View.jpg)
