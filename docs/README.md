@@ -25,7 +25,7 @@ Opensource Project Management Tool
 * Firewall
 
 This tool is inspired and built as an alternative to JIRA, Confluence and many other similar tools. 
-This project is a side project build to learn and try out different features and technologies.
+This is a side project built to learn and try out different features and technologies.
 
 ## Built using 
 - Spring boot 2.4 (Java 11)
