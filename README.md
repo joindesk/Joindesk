@@ -2,7 +2,7 @@
 Opensource Project Management Tool
 
 ## Details
-https://joindeskapp.com/
+https://joindesk.github.io/Joindesk/
 
 ## Features
 * Issue Management
