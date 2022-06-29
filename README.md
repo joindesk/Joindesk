@@ -4,6 +4,18 @@ Opensource Project Management Tool
 ## Details
 https://joindesk.github.io/Joindesk/
 
+## Demo: 
+http://144.24.133.99/
+
+*Admin:* demo-admin@domain.com
+
+*Demo Project Manager:* demo-manager@domain.com
+
+*Demo Project User:* demo-user@domain.com
+
+*password:* Demo@123
+
+
 ## Features
 * Issue Management
 * Kanban Board
