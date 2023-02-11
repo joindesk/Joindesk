@@ -90,11 +90,10 @@ public class AuthService {
             }
             PreferredAuthTypes otpMode = mode != null ? mode : user.getPreferredAuth();
             switch (otpMode) {
-                case EMAIL:
+                case EMAIL ->
                     //emailService.sendTextMail(agent.getEmail(), "OTP for login", "OTP: " + agent.getToken());
-                    resp.put("info", "OTP sent via email");
-                    break;
-                case SLACK:
+                        resp.put("info", "OTP sent via email");
+                case SLACK -> {
                     if (!agent.isSlackEnabled())
                         resp.put("error", "Slack not available");
                     try {
@@ -107,8 +106,8 @@ public class AuthService {
                     }
                     resp.put("info", "OTP sent via slack");
                     otpMode = PreferredAuthTypes.SLACK;
-                    break;
-                case MFA:
+                }
+                case MFA -> {
                     if (!agent.isMfaEnabled()) {
                         resp.put("error", "Authenticator not configured");
                         //emailService.sendTextMail(agent.getEmail(), "OTP for login", "OTP: " + agent.getToken());
@@ -117,7 +116,7 @@ public class AuthService {
                     }
                     resp.put("info", "Enter TOTP from Authenticator");
                     otpMode = PreferredAuthTypes.MFA;
-                    break;
+                }
             }
             return resp.put("success", true).put("otpMode", otpMode).put("user", HelperUtil.squiggly("base,user_detail", user)).toString();
         }
@@ -164,50 +163,50 @@ public class AuthService {
 
     public String authenticate(String userName, String password, boolean remember, String deviceFp, String deviceInfo, PreferredAuthTypes mode, HttpServletRequest request, HttpServletResponse response) {
         JSONObject resp = new JSONObject();
-        Login agent;
+        Login login;
         if (userName.contains("@")) {
-            agent = loginRepo.findByEmailIgnoreCase(userName.toLowerCase());
+            login = loginRepo.findByEmailIgnoreCase(userName.toLowerCase());
         } else {
-            agent = loginRepo.findByUserNameIgnoreCase(userName.toLowerCase());
+            login = loginRepo.findByUserNameIgnoreCase(userName.toLowerCase());
         }
-        if (agent != null && new BCryptPasswordEncoder().matches(password, agent.getPassword())) {
-            //if (agent != null && verifyMFAToken(agent, password, mode)) {
+        if (login != null && new BCryptPasswordEncoder().matches(password, login.getPassword())) {
+            //if (login != null && verifyMFAToken(login, password, mode)) {
             // reset token
-            agent.setToken(UUID.randomUUID().toString().substring(0, 8));
-            agent.setTokenExpiry(LocalDateTime.now().minusMinutes(1));
-            agent = loginRepo.save(agent);
+            login.setToken(UUID.randomUUID().toString().substring(0, 8));
+            login.setTokenExpiry(LocalDateTime.now().minusMinutes(1));
+            login = loginRepo.save(login);
             String currentIP = HelperUtil.getClientIp(request);
             if (!ipWhiteBlackListingService.isAllowedWeb(currentIP) || deviceInfo.isEmpty())
                 return resp.put("success", false).put("message", "Access denied from current location").toString();
-            if (!agent.isActive())
+            if (!login.isActive())
                 return resp.put("success", false).put("message", "Account inactive, Please contact Administrator").toString();
-            if (agent.isPendingActivation())
+            if (login.isPendingActivation())
                 return resp.put("success", false).put("message", "Account not activated, Please contact Administrator").toString();
-            if (agent.isLocked())
-                return resp.put("success", false).put("message", "Locked: " + agent.getLockReason()).toString();
+            if (login.isLocked())
+                return resp.put("success", false).put("message", "Locked: " + login.getLockReason()).toString();
             String timeZone = request.getHeader("X-TZ");
-            agent.setTimezone(TimeZone.getTimeZone(timeZone));
-            currentLogin.setUser(agent);
-            currentLogin.setAuthorities(getAuthorities(agent));
-            currentLogin.setAuthoritiesGlobal(getGlobalAuthorities(agent));
+            login.setTimezone(TimeZone.getTimeZone(timeZone));
+            currentLogin.setUser(login);
+            currentLogin.setAuthorities(getAuthorities(login));
+            currentLogin.setAuthoritiesGlobal(getGlobalAuthorities(login));
             Map<String, Object> additionalClaims = new HashMap<>();
             additionalClaims.put("user", HelperUtil.squiggly("base,-email,-createdAt,-updatedAt,-pendingActivation," +
-                    "-preferredAuth,-lockReason,-emailNotification,-slackNotification,-slackEnabled,-apiEnabled,-slackID,-slackAvailable,-qrUrl", agent));
+                    "-preferredAuth,-lockReason,-emailNotification,-slackNotification,-slackEnabled,-apiEnabled,-slackID,-slackAvailable,-qrUrl", login));
             additionalClaims.put("accpr", HelperUtil.squiggly("base,project_detail,-lead,-notifyViaSlack,-slackChannel," +
                     "-description,-timeTracking", projectService.getViewableProjects()));
-            additionalClaims.put("g", getGlobalAuthorities(agent).stream().map(a -> a.getAuthorityCode().name()).collect(Collectors.toList()));
-            additionalClaims.put("admin", agent.isSuperAdmin());
+            additionalClaims.put("g", getGlobalAuthorities(login).stream().map(a -> a.getAuthorityCode().name()).collect(Collectors.toList()));
+            additionalClaims.put("admin", login.isSuperAdmin());
             //additionalClaims.put("deviceInfo", deviceInfo);
             //additionalClaims.put("deviceFp", deviceFp);
             additionalClaims.put("currentIP", currentIP);
             additionalClaims.put("timeZone", timeZone);
             additionalClaims.put("remember", remember ? "true" : "false");
             /*String jwtToken = Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS512, appProperties.getJwtsecret()).compact();*/
-            String jwtToken = jwtTokenUtil.generateToken(agent.getUserName(), additionalClaims);
+            String jwtToken = jwtTokenUtil.generateToken(login.getUserName(), additionalClaims);
             Token t = new Token();
-            t.setUser(agent);
+            t.setUser(login);
             t.setToken(jwtToken);
-            t.setUser(agent);
+            t.setUser(login);
             t.setDeviceInfo(deviceInfo);
             t.setFp(deviceFp);
             t.setIp(currentIP);

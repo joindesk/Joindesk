@@ -4,9 +4,11 @@ import com.ariseontech.joindesk.project.domain.Project;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -34,4 +36,7 @@ public class AuthorityProject {
 
     @Enumerated(EnumType.STRING)
     private AuthorityCode authorityCode;
+
+    @UpdateTimestamp
+    private LocalDateTime lastUpdated;
 }

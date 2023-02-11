@@ -56,10 +56,7 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
         AuthService authService = webApplicationContext.getBean(AuthService.class);
         IPWhiteBlackListingService ipWhiteBlackListingService = webApplicationContext.getBean(IPWhiteBlackListingService.class);
         CurrentLogin currentLogin = webApplicationContext.getBean(CurrentLogin.class);
-        boolean skip = false;
-        if (requestUri.startsWith("/auth/login") || requestUri.startsWith("/auth/register")) {
-            skip = true;
-        }
+        boolean skip = requestUri.startsWith("/auth/login") || requestUri.startsWith("/auth/register");
         if (requestUri.startsWith("/ws") ||
                 requestUri.equalsIgnoreCase("/error") || requestUri.equalsIgnoreCase("/api/error")) {
             skip = true;

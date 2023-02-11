@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -70,9 +72,11 @@ public class Login implements Serializable {
     private String apiToken;
 
     @JsonView(View.Details.class)
+    @CreationTimestamp
     private Date createdAt;
 
     @JsonView(View.Details.class)
+    @UpdateTimestamp
     private Date updatedAt;
 
     @JsonView(View.Details.class)

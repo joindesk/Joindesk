@@ -243,7 +243,7 @@ public class WorkflowService {
         if (!hasWorkflowManageAccess(workflow))
             throw new JDException("", ErrorCode.FORBIDDEN, HttpStatus.FORBIDDEN);
         Optional<WorkflowStep> workflowStep = workflowStepRepo.findById(stp.getId());
-        if (!workflowStep.isPresent())
+        if (workflowStep.isEmpty())
             throw new JDException("", ErrorCode.WORKFLOW_STEP_NOT_FOUND, HttpStatus.NOT_FOUND);
         WorkflowStep step = workflowStep.get();
         workflowStepRepo.save(step);
@@ -257,7 +257,7 @@ public class WorkflowService {
         Set<WorkflowStep> steps = getWorkflowSteps(workflow);
         if (steps.stream().noneMatch(s -> s.getId().equals(stepID)))
             throw new JDException("", ErrorCode.WORKFLOW_STEP_NOT_FOUND, HttpStatus.NOT_FOUND);
-        WorkflowStep step = steps.stream().filter(s -> s.getId().equals(stepID)).collect(Collectors.toList()).get(0);
+        WorkflowStep step = steps.stream().filter(s -> s.getId().equals(stepID)).toList().get(0);
         if (step.getId().equals(workflow.getDefaultStep().getId()))
             throw new JDException("", ErrorCode.CANNOT_EDIT_DELETE_DEFAULT_STEP, HttpStatus.PRECONDITION_FAILED);
         if (!issueRepo.findByCurrentStep(step).isEmpty())
@@ -343,98 +343,90 @@ public class WorkflowService {
         wtps.forEach(wtp -> {
             StringBuilder sb = new StringBuilder();
             switch (wtp.getSubType()) {
-                case CONDITION_CURRENT_USER:
-                    Arrays.stream(wtp.getValue().split(",")).forEach(v -> {
-                        switch (v) {
-                            case "-assignee-":
-                                if (sb.length() > 0) sb.append(", ");
-                                sb.append("Current user");
-                                break;
-                            case "-reporter-":
-                                if (sb.length() > 0) sb.append(", ");
-                                sb.append("Reporter");
-                                break;
-                            case "-lead-":
-                                if (sb.length() > 0) sb.append(", ");
-                                sb.append("Lead");
-                                break;
-                            default:
-                                try {
-                                    Optional<Login> l = loginRepo.findById(Long.parseLong(v));
-                                    l.ifPresent(ll -> {
-                                        if (sb.length() > 0) sb.append(", ");
-                                        sb.append(ll.getFullName());
-                                    });
-                                } catch (Exception e) {
-                                    //skip
-                                }
-                                break;
+                case CONDITION_CURRENT_USER -> Arrays.stream(wtp.getValue().split(",")).forEach(v -> {
+                    switch (v) {
+                        case "-assignee-" -> {
+                            if (sb.length() > 0) sb.append(", ");
+                            sb.append("Current user");
                         }
-                    });
-                    break;
-                case CONDITION_IS_IN_GROUP:
-                    Arrays.stream(wtp.getValue().split(",")).forEach(v -> {
-                        try {
-                            Optional<Group> l = groupRepo.findById(Long.parseLong(v));
-                            l.ifPresent(ll -> {
-                                if (sb.length() > 0) sb.append(", ");
-                                sb.append(ll.getName());
-                            });
-                        } catch (Exception e) {
-                            //skip
+                        case "-reporter-" -> {
+                            if (sb.length() > 0) sb.append(", ");
+                            sb.append("Reporter");
                         }
-                    });
-                    break;
-                case POST_FUNCTION_ASSIGN_TO_USER:
-                    Arrays.stream(wtp.getValue().split(",")).forEach(v -> {
-                        switch (v) {
-                            case "-none-":
-                                if (sb.length() > 0) sb.append(", ");
-                                sb.append("Remove assignee");
-                                break;
-                            case "-reporter-":
-                                if (sb.length() > 0) sb.append(", ");
-                                sb.append("Reporter");
-                                break;
-                            case "-current-":
-                                if (sb.length() > 0) sb.append(", ");
-                                sb.append("Current user");
-                                break;
-                            default:
-                                try {
-                                    Optional<Login> l = loginRepo.findById(Long.parseLong(v));
-                                    l.ifPresent(ll -> {
-                                        if (sb.length() > 0) sb.append(", ");
-                                        sb.append(ll.getFullName());
-                                    });
-                                } catch (Exception e) {
-                                    //skip
-                                }
-                                break;
+                        case "-lead-" -> {
+                            if (sb.length() > 0) sb.append(", ");
+                            sb.append("Lead");
                         }
-                    });
-                    break;
-                case POST_FUNCTION_UPDATE_FIELD:
+                        default -> {
+                            try {
+                                Optional<Login> l = loginRepo.findById(Long.parseLong(v));
+                                l.ifPresent(ll -> {
+                                    if (sb.length() > 0) sb.append(", ");
+                                    sb.append(ll.getFullName());
+                                });
+                            } catch (Exception e) {
+                                //skip
+                            }
+                        }
+                    }
+                });
+                case CONDITION_IS_IN_GROUP -> Arrays.stream(wtp.getValue().split(",")).forEach(v -> {
+                    try {
+                        Optional<Group> l = groupRepo.findById(Long.parseLong(v));
+                        l.ifPresent(ll -> {
+                            if (sb.length() > 0) sb.append(", ");
+                            sb.append(ll.getName());
+                        });
+                    } catch (Exception e) {
+                        //skip
+                    }
+                });
+                case POST_FUNCTION_ASSIGN_TO_USER -> Arrays.stream(wtp.getValue().split(",")).forEach(v -> {
+                    switch (v) {
+                        case "-none-" -> {
+                            if (sb.length() > 0) sb.append(", ");
+                            sb.append("Remove assignee");
+                        }
+                        case "-reporter-" -> {
+                            if (sb.length() > 0) sb.append(", ");
+                            sb.append("Reporter");
+                        }
+                        case "-current-" -> {
+                            if (sb.length() > 0) sb.append(", ");
+                            sb.append("Current user");
+                        }
+                        default -> {
+                            try {
+                                Optional<Login> l = loginRepo.findById(Long.parseLong(v));
+                                l.ifPresent(ll -> {
+                                    if (sb.length() > 0) sb.append(", ");
+                                    sb.append(ll.getFullName());
+                                });
+                            } catch (Exception e) {
+                                //skip
+                            }
+                        }
+                    }
+                });
+                case POST_FUNCTION_UPDATE_FIELD -> {
                     switch (wtp.getKey()) {
-                        case "Resolution":
+                        case "Resolution" -> {
                             if (wtp.getValue().equalsIgnoreCase("-none-"))
                                 sb.append("Remove Resolution");
                             else
                                 resolutionRepo.findById(Long.parseLong(wtp.getValue())).ifPresent(r -> {
                                     sb.append(r.getName());
                                 });
-                            break;
-                        case "Priority":
+                        }
+                        case "Priority" -> {
                             if (wtp.getValue().equalsIgnoreCase("-none-"))
                                 sb.append("Remove Priority");
                             else
                                 sb.append(wtp.getValue());
-                            break;
+                        }
                     }
-                    break;
-                default:
-                    sb.append(wtp.getValue());
-                    break;
+                }
+                default -> sb.append(wtp.getValue());
             }
             wtp.setDisplayValue(sb.toString());
         });
@@ -479,25 +471,24 @@ public class WorkflowService {
 
         Fields field = null;
         switch (subType) {
-            case POST_FUNCTION_ASSIGN_TO_USER:
+            case POST_FUNCTION_ASSIGN_TO_USER -> {
                 List<FieldValue> users = new ArrayList<>();
                 users.add(new FieldValue("-none-", "--None--"));
                 users.add(new FieldValue("-current-", "--Current User--"));
                 users.add(new FieldValue("-reporter-", "--Reporter--"));
                 users.addAll(projectService.getMembers(w.getProject().getId()).stream().map(m -> new FieldValue(m.getId() + "", m.getFullName())).collect(Collectors.toList()));
                 field = new Fields("Assign to user", "select", null, users);
-                break;
-            case POST_FUNCTION_UPDATE_FIELD:
+            }
+            case POST_FUNCTION_UPDATE_FIELD -> {
                 field = new Fields("Update field", "sub-select", null, new ArrayList<>());
                 ArrayList<SubFields> subFields = new ArrayList<>();
                 subFields.add(new SubFields("Resolution", "select", resolutionRepo.findAll().stream().map(r -> new FieldValue(r.getId() + "", r.getName())).collect(Collectors.toList())));
                 subFields.add(new SubFields("Priority", "select", Arrays.stream(Priority.values()).map(s -> new FieldValue(s.name(), s.name())).collect(Collectors.toList())));
                 field.setSubFields(subFields);
-                break;
-            case CONDITION_HAS_PERMISSION:
-                field = new Fields("any of", "select-multiple", null, Arrays.stream(AuthorityCode.values()).map(a -> new FieldValue(a.name(), a.name())).collect(Collectors.toList()));
-                break;
-            case CONDITION_FIELD_REQUIRED:
+            }
+            case CONDITION_HAS_PERMISSION ->
+                    field = new Fields("any of", "select-multiple", null, Arrays.stream(AuthorityCode.values()).map(a -> new FieldValue(a.name(), a.name())).collect(Collectors.toList()));
+            case CONDITION_FIELD_REQUIRED -> {
                 List<FieldValue> fields = new ArrayList<>();
                 //issueService.getCustomFieldsForProject(w.getProject()).stsubTypeKeyream().map(a -> new FieldValue(a.getCustomField().getKey(), a.getCustomField().getName())).collect(Collectors.toList());
                 fields.add(new FieldValue("resolution", "Resolution"));
@@ -505,23 +496,22 @@ public class WorkflowService {
 //                fields.add(new FieldValue("version", "Version"));
 //                fields.add(new FieldValue("component", "Component"));
                 field = new Fields("any of", "select-multiple", null, fields);
-                break;
-            case CONDITION_IS_IN_GROUP:
-                field = new Fields("any of", "select-multiple", null, groupService.getAllGroupsForProject(w.getProject().getKey()).stream().map(a -> new FieldValue(a.getId() + "", a.getName())).collect(Collectors.toList()));
-                break;
-            case CONDITION_CURRENT_USER:
+            }
+            case CONDITION_IS_IN_GROUP ->
+                    field = new Fields("any of", "select-multiple", null, groupService.getAllGroupsForProject(w.getProject().getKey()).stream().map(a -> new FieldValue(a.getId() + "", a.getName())).collect(Collectors.toList()));
+            case CONDITION_CURRENT_USER -> {
                 List<FieldValue> cUser = new ArrayList<>();
                 cUser.add(new FieldValue("-assignee-", "--Assignee--"));
                 cUser.add(new FieldValue("-reporter-", "--Reporter--"));
                 cUser.add(new FieldValue("-lead-", "--Project Lead--"));
                 cUser.addAll(projectService.getMembers(w.getProject().getId()).stream().map(m -> new FieldValue(m.getId() + "", m.getFullName())).collect(Collectors.toList()));
                 field = new Fields("any of", "select-multiple", null, cUser);
-                break;
-            case CONDITION_CHECKLIST_COMPLETE:
+            }
+            case CONDITION_CHECKLIST_COMPLETE -> {
                 List<FieldValue> cListC = new ArrayList<>();
                 cListC.add(new FieldValue("-all-", "All items checked"));
                 field = new Fields("Require", "select", null, cListC);
-                break;
+            }
         }
         return field;
     }
